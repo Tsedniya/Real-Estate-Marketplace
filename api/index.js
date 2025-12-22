@@ -1,6 +1,6 @@
 import express from 'express';
 
-
+mongoose.connect();
 const app = express();
 
 app.listen(3000,()=>{

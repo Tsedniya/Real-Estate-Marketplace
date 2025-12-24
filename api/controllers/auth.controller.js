@@ -1,3 +1,3 @@
-export const signUp = (req,res)=>{
-
+export const signup = (req,res)=>{
+     console.log(req.body)
 }

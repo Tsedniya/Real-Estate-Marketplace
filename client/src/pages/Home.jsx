@@ -1,8 +1,12 @@
 import React from 'react'
+import SignUp from './SignUp'
 
 const Home = () => {
   return (
-    <div>Home</div>
+    <div className='bg-[#022222]'>
+
+      <SignUp/>
+    </div>
   )
 }
 

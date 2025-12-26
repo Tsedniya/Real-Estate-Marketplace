@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#022222];
+  }
+}

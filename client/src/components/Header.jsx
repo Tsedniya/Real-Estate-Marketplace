@@ -4,13 +4,13 @@ import {FaSearch} from 'react-icons/fa'
 
 const Header = () => {
   return (
-    <nav className=' bg-transparent shadow-md'>
+    <nav className=' bg-[#022222]'>
        <div className='flex items-center justify-between max-w-6xl mx-auto p-3'>
             
             <Link to='/'>
                 <h2 className='font-semibold text-sm sm:text-xl gap-1 flex flex-wrap'>
-                    <span className='text-black text-2xl'>Tsehay</span>
-                    <span className='text-black  text-2xl'>Estate</span>
+                    <span className='text-white text-2xl'>Tsehay</span>
+                    <span className='text-white  text-2xl'>Estate</span>
                 </h2>
             </Link>
         
@@ -21,9 +21,9 @@ const Header = () => {
             </form>
             <ul className='flex gap-4'>
 
-                <NavLink to='/' className='hidden sm:inline text-black  hover:text-[#F54545]'>Home</NavLink>
-                <NavLink to='/about' className='hidden sm:inline text-black  hover:text-[#F54545]'>About</NavLink>
-                <NavLink to='/sign-in' className='sm:inline text-black hover:text-[#F54545]'>Sign in</NavLink>
+                <NavLink to='/' className='hidden sm:inline text-white  hover:text-[#F54545]'>Home</NavLink>
+                <NavLink to='/about' className='hidden sm:inline text-white  hover:text-[#F54545]'>About</NavLink>
+                <NavLink to='/sign-in' className='sm:inline text-white hover:text-[#F54545]'>Sign in</NavLink>
             </ul>
 
           

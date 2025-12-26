@@ -3,7 +3,7 @@ import SignUp from './SignUp'
 
 const Home = () => {
   return (
-    <div>
+    <div className='bg-[#022222]'>
 
       <SignUp/>
     </div>

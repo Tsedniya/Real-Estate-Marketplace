@@ -24,7 +24,7 @@ const SignUp = () => {
         <input className='border p-3 rounded-lg text-white w-full' type="email" placeholder='Email' onChange={handleChange}/>
         <input className='border p-3 rounded-lg text-white w-full' type="password" placeholder='Password' onChange={handleChange}/>
         <button className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase">SIGN UP</button>
-        <button className='className="border p-3 rounded-lg uppercase bg-white text-[#022222] hover:bg-[#022222] hover:text-white w-full'>CONTINUE WITH GOOGLE</button>
+        <button className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase">CONTINUE WITH GOOGLE</button>
       </form>
       <div className='flex gap-2 mt-5'>
         <p className='text-white'>Have an account?</p>

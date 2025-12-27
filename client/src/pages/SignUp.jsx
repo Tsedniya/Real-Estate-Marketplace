@@ -13,8 +13,19 @@ const SignUp = () => {
   };
   //console.log(formData)
   
-  const handleSubmit= (e)=>{
+  const handleSubmit= async(e)=>{
       e.preventDefault
+      const res = await fetch('/api/auth/signup',
+        
+      {
+        method:'POST',
+        headers: {
+          'Content-Type':'application/json',
+        },
+        body:JSON.stringify(formData),
+      });
+      const data = await res.json();
+      console.log(data)
   }
   return (
     <div className='p-3 max-w-lg mx-auto'>

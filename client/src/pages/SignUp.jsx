@@ -14,7 +14,7 @@ const SignUp = () => {
   //console.log(formData)
   
   const handleSubmit= async(e)=>{
-      e.preventDefault
+      e.preventDefault()
       const res = await fetch('/api/auth/signup',
         
       {
@@ -32,8 +32,8 @@ const SignUp = () => {
        <h1 className='my-7 text-3xl text-center font-semibold text-white'>SignUp</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'> 
         <input className='border p-3 rounded-lg text-white w-full' id='username' type="text" placeholder='Username' onChange={handleChange}/>
-        <input className='border p-3 rounded-lg text-white w-full' type="email" placeholder='Email' onChange={handleChange}/>
-        <input className='border p-3 rounded-lg text-white w-full' type="password" placeholder='Password' onChange={handleChange}/>
+        <input className='border p-3 rounded-lg text-white w-full' id="email" type="email" placeholder='Email' onChange={handleChange}/>
+        <input className='border p-3 rounded-lg text-white w-full' id="password" type="password" placeholder='Password' onChange={handleChange}/>
         <button className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase">SIGN UP</button>
         <button className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase">CONTINUE WITH GOOGLE</button>
       </form>

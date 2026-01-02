@@ -22,7 +22,7 @@ const SignIn = () => {
       e.preventDefault();
 
     try{
-      dispatch(signInStart)
+      dispatch(signInStart())
       // request backend
       const res = await fetch('/api/auth/signin',
         

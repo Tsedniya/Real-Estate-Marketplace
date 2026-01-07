@@ -58,7 +58,7 @@ const SignUp = () => {
         <input className='border p-3 rounded-lg text-white w-full' id="email" type="email" placeholder='Email' onChange={handleChange}/>
         <input className='border p-3 rounded-lg text-white w-full' id="password" type="password" placeholder='Password' onChange={handleChange}/>
         <button disabled={loading} className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase">{loading ? 'Loading..' : 'Sign Up'}</button>
-        <button className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase">CONTINUE WITH GOOGLE</button>
+        <OAuth/>
       </form>
       <div className='flex gap-2 mt-5'>
         <p className='text-white'>Have an account?</p>

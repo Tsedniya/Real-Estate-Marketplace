@@ -23,7 +23,7 @@ const SignUp = () => {
       e.preventDefault();
 
     try{
-      setLoading(true)
+       dispatch(signInStart())
       // request backend
       const res = await fetch('/api/auth/signup',
         

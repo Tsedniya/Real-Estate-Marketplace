@@ -36,7 +36,7 @@ const SignUp = () => {
       });
       const data = await res.json();
       if(data.success === false){
-        setLoading(false);
+        dispatch(signInStart())
         setError(data.message);
       
         return;

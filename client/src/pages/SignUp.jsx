@@ -41,7 +41,7 @@ const SignUp = () => {
       
         return;
       }
-      setLoading(false)
+      dispatch(signInStart())
       setError(null)
       navigate('signin')
 

@@ -42,7 +42,7 @@ const SignUp = () => {
         return;
       }
       dispatch(signInStart())
-      setError(null)
+      
       navigate('signin')
 
       }catch(error){

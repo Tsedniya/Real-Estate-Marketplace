@@ -46,7 +46,7 @@ const SignUp = () => {
       navigate('signin')
 
       }catch(error){
-        setLoading(false)
+        dispatch(signInStart())
         setError(Error.message)
       }
      

@@ -1,9 +1,12 @@
 import React from 'react';
 import {GoogleAuthProvider, getAuth, signInWithPopup} from 'firebase/auth';
 import { app } from '../firebase';
+import { useDispatch } from 'react-redux';
+import { signInSuccess } from '../redux/user/userSlice';
 
 const OAuth = () => {
     const handleGoogleClick = async()=>{
+    const dispatch = useDispatch();
 
      try{
         const provider = new GoogleAuthProvider()

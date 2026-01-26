@@ -1,3 +1,3 @@
 export const test = (req,res) =>{
-        res.send("HI")
+        res.status(200).json("message : HI")
 }

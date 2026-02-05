@@ -7,9 +7,7 @@ import {
 } from "../redux/user/userSlice";
 
 const Profile = () => {
-  const { currentUser, loading, error } = useSelector(
-    (state) => state.user
-  );
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({});

@@ -3,6 +3,7 @@ import { Link , useNavigate} from 'react-router-dom'
 import { useState } from 'react';
 import OAuth from '../components/OAuth'
 import {useDispatch,useSelector} from 'react-redux';
+import { signInFailure,signInStart,signInSuccess } from '../redux/user/userSlice';
 
 const SignUp = () => {
       
@@ -36,18 +37,15 @@ const SignUp = () => {
       });
       const data = await res.json();
       if(data.success === false){
-        dispatch(signInStart())
-        setError(data.message);
+        dispatch(signInFailure(data.message))
       
         return;
       }
-      dispatch(signInStart())
-      
-      navigate('signin')
+       dispatch(signInSuccess(data))
+       navigate('/')
 
       }catch(error){
-        dispatch(signInStart())
-        setError(Error.message)
+        dispatch(signInFailure(error.message))
       }
      
       //console.log(data)

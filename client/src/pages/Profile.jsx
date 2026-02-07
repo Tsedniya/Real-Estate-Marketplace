@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  deleteUserFailure,  deleteUserSuccess, deleteUserStart, updateUserFailure, updateUserSuccess, updateUserStart
+  signOutUserStart,signOutUserSuccess ,signOutUserFailure,deleteUserFailure,  deleteUserSuccess, deleteUserStart, updateUserFailure, updateUserSuccess, updateUserStart
 } from "../redux/user/userSlice";
 
 const Profile = () => {
@@ -65,6 +65,24 @@ const Profile = () => {
     }
   }
 
+  const handleSignOut = async()=>{
+
+    try{
+      dispatch(signOutUserStart())
+      const res = await fetch('/api/auth/signout');
+      const data = await res.json();
+      if(data.success === false){
+         dispatch(signOutUserFailure(data.message))
+         return;
+      }
+      dispatch(signOutUserSuccess(data));
+      setFormData({});
+    }catch(error){
+      dispatch(signOutUserFailure(error.message))
+    }
+  }
+
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="my-7 text-3xl text-center font-semibold text-white">
@@ -72,7 +90,6 @@ const Profile = () => {
       </h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-       
         <img
           src={currentUser.avatar}
           alt="profile"
@@ -83,7 +100,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="username"
           type="text"
-          defaultValue={currentUser.username}
+          value={formData.username ?? currentUser.username}
           placeholder="Username"
           onChange={handleChange}
         />
@@ -92,7 +109,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="email"
           type="email"
-          defaultValue={currentUser.email}
+          value={formData.email ?? currentUser.email}
           placeholder="Email"
           onChange={handleChange}
         />
@@ -101,6 +118,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="password"
           type="password"
+          value={formData.password || ''}  // password starts empty
           placeholder="New password"
           onChange={handleChange}
         />
@@ -114,7 +132,7 @@ const Profile = () => {
       </form>
       <div className='flex justify-between mt-5'>
          <span onClick={handleDeleteUser} className='text-[#2bcebb] cursor-pointer'>Delete account</span>
-         <span className='text-[#2bcebb] cursor-pointer'>Sign out</span>
+         <span onClick={handleSignOut} className='text-[#2bcebb] cursor-pointer'>Sign out</span>
       </div>
 
       <p className="text-red-500 mt-5">{error ? error: ''}</p>

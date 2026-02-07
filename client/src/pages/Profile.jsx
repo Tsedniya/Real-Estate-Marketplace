@@ -70,12 +70,13 @@ const Profile = () => {
     try{
       dispatch(signOutUserStart())
       const res = await fetch('/api/auth/signout');
-      const deta = await res.json();
+      const data = await res.json();
       if(data.success === false){
          dispatch(signOutUserFailure(data.message))
          return;
       }
       dispatch(signOutUserSuccess(data));
+      setFormData({});
     }catch(error){
       dispatch(signOutUserFailure(error.message))
     }
@@ -89,7 +90,6 @@ const Profile = () => {
       </h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-       
         <img
           src={currentUser.avatar}
           alt="profile"
@@ -100,7 +100,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="username"
           type="text"
-          defaultValue={currentUser.username}
+          value={formData.username ?? currentUser.username}
           placeholder="Username"
           onChange={handleChange}
         />
@@ -109,7 +109,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="email"
           type="email"
-          defaultValue={currentUser.email}
+          value={formData.email ?? currentUser.email}
           placeholder="Email"
           onChange={handleChange}
         />
@@ -118,6 +118,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="password"
           type="password"
+          value={formData.password || ''}  // password starts empty
           placeholder="New password"
           onChange={handleChange}
         />

@@ -118,7 +118,7 @@ const Profile = () => {
           className="border p-3 rounded-lg text-white w-full"
           id="password"
           type="password"
-          value={formData.password || ''}  // password starts empty
+          value={formData.password || ''}  
           placeholder="New password"
           onChange={handleChange}
         />
@@ -127,7 +127,7 @@ const Profile = () => {
           disabled={loading}
           className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase"
         >
-          {loading ? "Updating..." : "Update"}
+          {loading ? "Loading..." : "Update"}
         </button>
       </form>
       <div className='flex justify-between mt-5'>

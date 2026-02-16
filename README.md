@@ -22,7 +22,7 @@ This project is built as a real-world practice app to understand how modern full
 
 * **Node.js**
 * **Express.js**
-* **MongoDB** (Mongoose)
+* **MongoDB**
 * **JWT Authentication**
 * **bcrypt** for password hashing
 

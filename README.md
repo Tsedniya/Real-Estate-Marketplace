@@ -12,7 +12,7 @@ This project is built as a real-world practice app to understand how modern full
 
 ### Frontend
 
-* **React** (Vite)
+* **React**
 * **React Router**
 * **Redux Toolkit**
 * **Firebase Authentication** (Google Sign-In)

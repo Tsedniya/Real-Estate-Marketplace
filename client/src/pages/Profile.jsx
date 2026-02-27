@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   signOutUserStart,signOutUserSuccess ,signOutUserFailure,deleteUserFailure,  deleteUserSuccess, deleteUserStart, updateUserFailure, updateUserSuccess, updateUserStart
 } from "../redux/user/userSlice";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -129,6 +130,8 @@ const Profile = () => {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+
+        <Link to= {"create-listing"} className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:capacity-95">Create Listing</Link>
       </form>
       <div className='flex justify-between mt-5'>
          <span onClick={handleDeleteUser} className='text-[#2bcebb] cursor-pointer'>Delete account</span>

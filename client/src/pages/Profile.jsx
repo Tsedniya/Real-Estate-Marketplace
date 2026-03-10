@@ -126,7 +126,7 @@ const Profile = () => {
 
         <button
           disabled={loading}
-          className="border p-3 rounded-lg w-full bg-white text-[#022222] hover:bg-[#022222] hover:text-white uppercase"
+          className="border p-3 rounded-lg w-full 'p-3 bg-[#022222] text-white hover:opacity-87 uppercase"
         >
           {loading ? "Loading..." : "Update"}
         </button>

@@ -6,13 +6,13 @@ import {useSelector} from 'react-redux'
 const Header = () => {
     const {currentUser} = useSelector(state=>state.user)
   return (
-    <nav className=' bg-[#022222]'>
+    <nav className=' bg-[white]'>
        <div className='flex items-center justify-between max-w-6xl mx-auto p-3'>
             
             <Link to='/'>
                 <h2 className='font-semibold text-sm sm:text-xl flex flex-wrap'>
-                    <span className='text-white text-2xl'>Tsehay</span>
-                    <span className='text-white  text-2xl'>Estate</span>
+                    <span className='text-black text-2xl'>Tsehay</span>
+                    <span className='text-black  text-2xl'>Estate</span>
                 </h2>
             </Link>
         
@@ -24,19 +24,19 @@ const Header = () => {
             <ul className='flex gap-4'>
 
                 <Link to='/'>
-                <li className='hidden sm:inline text-white  hover:text-[#2bcebb]'>Home</li>
+                <li className='hidden sm:inline text-black  hover:text-[#2bcebb]'>Home</li>
 
                 </Link>
                
                 <Link to='/about'>
-                <li className='hidden sm:inline text-white  hover:text-[#2bcebb]'>About</li>
+                <li className='hidden sm:inline text-black  hover:text-[#2bcebb]'>About</li>
                 </Link>
                
                 <Link to='/profile'>
                  {currentUser ? (
                     <img className='rounded-full h-7 w-7 object-cover' src={currentUser.avatar} alt='profile'/>
                  ) : (
-                    <li className='sm:inline text-white hover:text-[#2bcebb]'>Sign in</li>
+                    <li className='sm:inline text-black hover:text-[#2bcebb]'>Sign in</li>
                  )}
                  </Link>   
             </ul>

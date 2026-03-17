@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux'
 const Header = () => {
     const {currentUser} = useSelector(state=>state.user)
   return (
-    <nav className=' bg-[white]'>
+    <nav className=' bg-[#ADEBB3]'>
        <div className='flex items-center justify-between max-w-6xl mx-auto p-3'>
             
             <Link to='/'>

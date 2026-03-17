@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  signOutUserStart,signOutUserSuccess ,signOutUserFailure,deleteUserFailure,  deleteUserSuccess, deleteUserStart, updateUserFailure, updateUserSuccess, updateUserStart
+  signOutUserStart,
+  signOutUserSuccess,
+  signOutUserFailure,
+  deleteUserFailure,
+  deleteUserSuccess,
+  deleteUserStart,
+  updateUserFailure,
+  updateUserSuccess,
+  updateUserStart,
 } from "../redux/user/userSlice";
 import { Link } from "react-router-dom";
 
@@ -10,7 +18,9 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({});
+  const [uploading, setUploading] = useState(false);
 
+  // handle text input
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -18,71 +28,121 @@ const Profile = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // handle image upload
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const data = new FormData();
+    data.append("image", file); // MUST match multer
 
     try {
-      dispatch(updateUserStart());
+      setUploading(true);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: data,
+        credentials: "include",
+      });
+
+      const result = await res.json();
+
+      if (result.message !== "Upload successful") {
+        console.log("Upload failed");
+        setUploading(false);
+        return;
+      }
+
+      // save image path
+      setFormData((prev) => ({
+        ...prev,
+        avatar: result.filePath,
+      }));
+
+      setUploading(false);
+    } catch (err) {
+      console.log(err);
+      setUploading(false);
+    }
+  };
+
+  // update user
+   const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    dispatch(updateUserStart());
+
+    // Merge currentUser with formData so nothing is lost
+    const updatedData = { ...currentUser, ...formData };
+
+    const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (data.success === false) {
+      dispatch(updateUserFailure(data.message));
+      return;
+    }
+
+    dispatch(updateUserSuccess(data));
+    setFormData({}); // optional: reset local form
+  } catch (err) {
+    dispatch(updateUserFailure(err.message));
+  }
+};
+
+  // delete user
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
 
       const res = await fetch(
-        `/api/user/update/${currentUser._id}`,
+        `/api/user/delete/${currentUser._id}`,
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-          credentials: "include",
+          method: "DELETE",
         }
       );
 
       const data = await res.json();
 
       if (data.success === false) {
-        dispatch(updateUserFailure(data.message));
-        return;
-      }
-
-      dispatch(updateUserSuccess(data));
-    } catch (err) {
-      dispatch(updateUserFailure(err.message));
-    }
-  };
-
-  const handleDeleteUser = async()=>{
-    try{
-      dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if(data.success === false){
         dispatch(deleteUserFailure(data.message));
         return;
       }
-       dispatch(deleteUserSuccess(data));
-    }catch(error){
-       dispatch(deleteUserFailure(error.message));
+
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
     }
-  }
+  };
 
-  const handleSignOut = async()=>{
+  // sign out
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
 
-    try{
-      dispatch(signOutUserStart())
-      const res = await fetch('/api/auth/signout');
+      const res = await fetch("/api/auth/signout");
       const data = await res.json();
-      if(data.success === false){
-         dispatch(signOutUserFailure(data.message))
-         return;
+
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return;
       }
+
       dispatch(signOutUserSuccess(data));
       setFormData({});
-    }catch(error){
-      dispatch(signOutUserFailure(error.message))
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
     }
-  }
-
+  };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -91,12 +151,23 @@ const Profile = () => {
       </h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        
+        {/* PROFILE IMAGE */}
         <img
-          src={currentUser.avatar}
+          src={formData.avatar || currentUser.avatar}
           alt="profile"
           className="rounded-full h-24 w-24 object-cover self-center mt-2"
         />
 
+        {/* FILE INPUT */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          className="border p-2 rounded-lg text-white"
+        />
+
+        {/* USERNAME */}
         <input
           className="border p-3 rounded-lg text-white w-full"
           id="username"
@@ -106,6 +177,7 @@ const Profile = () => {
           onChange={handleChange}
         />
 
+        {/* EMAIL */}
         <input
           className="border p-3 rounded-lg text-white w-full"
           id="email"
@@ -115,35 +187,58 @@ const Profile = () => {
           onChange={handleChange}
         />
 
+        {/* PASSWORD */}
         <input
           className="border p-3 rounded-lg text-white w-full"
           id="password"
           type="password"
-          value={formData.password || ''}  
+          value={formData.password || ""}
           placeholder="New password"
           onChange={handleChange}
         />
 
+        {/* UPDATE BUTTON */}
         <button
-          disabled={loading}
-          className="border p-3 rounded-lg w-full 'p-3 bg-[#022222] text-white hover:opacity-87 uppercase"
+          disabled={loading || uploading}
+          className="border p-3 rounded-lg w-full bg-[#022222] text-white uppercase"
         >
-          {loading ? "Loading..." : "Update"}
+          {uploading
+            ? "Uploading..."
+            : loading
+            ? "Loading..."
+            : "Update"}
         </button>
 
-        <Link to= {"create-listing"} className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:capacity-95">Create Listing</Link>
+        {/* CREATE LISTING */}
+        <Link
+          to={"create-listing"}
+          className="bg-green-700 text-white p-3 rounded-lg uppercase text-center"
+        >
+          Create Listing
+        </Link>
       </form>
-      <div className='flex justify-between mt-5'>
-         <span onClick={handleDeleteUser} className='text-[#2bcebb] cursor-pointer'>Delete account</span>
-         <span onClick={handleSignOut} className='text-[#2bcebb] cursor-pointer'>Sign out</span>
+
+      {/* ACTIONS */}
+      <div className="flex justify-between mt-5">
+        <span
+          onClick={handleDeleteUser}
+          className="text-[#2bcebb] cursor-pointer"
+        >
+          Delete account
+        </span>
+
+        <span
+          onClick={handleSignOut}
+          className="text-[#2bcebb] cursor-pointer"
+        >
+          Sign out
+        </span>
       </div>
 
-      <p className="text-red-500 mt-5">{error ? error: ''}</p>
+      {/* ERROR */}
+      <p className="text-red-500 mt-5">{error ? error : ""}</p>
     </div>
   );
 };
 
 export default Profile;
-
-     
-    

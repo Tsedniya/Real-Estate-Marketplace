@@ -1,110 +1,139 @@
-import React from 'react'
+import React, { useState } from "react";
 
 const CreateListing = () => {
+  const [files, setFiles] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
+  // upload all selected images
+  const handleImageSubmit = async () => {
+    if (files.length === 0) return;
+
+    if (files.length > 6) {
+      alert("You can upload max 6 images");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const promises = [];
+
+      for (let i = 0; i < files.length; i++) {
+        promises.push(storeImage(files[i]));
+      }
+
+      const urls = await Promise.all(promises);
+
+      setImageUrls((prev) => [...prev, ...urls]);
+
+      setUploading(false);
+    } catch (error) {
+      console.log(error);
+      setUploading(false);
+    }
+  };
+
+  // upload single image
+  const storeImage = async (file) => {
+    const data = new FormData();
+    data.append("image", file); // must match multer
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: data,
+      credentials: "include",
+    });
+
+    const result = await res.json();
+
+    if (result.message !== "Upload successful") {
+      throw new Error("Upload failed");
+    }
+
+    return result.filePath;
+  };
 
   return (
     <main className="p-3 max-w-4xl mx-auto">
+      <h1 className="md:text-5xl text-3xl font-semibold text-center my-7 py-5">
+        Create a Listing
+      </h1>
 
-        <h1 className='md:text-5xl text-3xl font-semibold text-center my-7 py-5'>Create a Listing</h1>
-        <form className='flex flex-col sm:flex-row gap-12'>
-            <div className='flex flex-col gap-4 flex-1'>
+      <form className="flex flex-col sm:flex-row gap-12">
+        {/* LEFT */}
+        <div className="flex flex-col gap-4 flex-1">
+          <input
+            type="text"
+            placeholder="Name"
+            className="border p-3 rounded-lg border-black"
+            id="name"
+            required
+          />
 
-                <input type="text" placeholder='Name' className='border p-3 rounded-lg  border-black' id='name' maxLength='62' minLength='10' required/> 
+          <textarea
+            placeholder="Description"
+            className="border p-3 rounded-lg border-black"
+            id="description"
+            required
+          />
 
-                <textarea type="text" placeholder='Description' className='border p-3  rounded-lg border-black' id='description' required/> 
+          <input
+            type="text"
+            placeholder="Address"
+            className="border p-3 rounded-lg border-black"
+            id="address"
+            required
+          />
+        </div>
 
-                <input type="text" placeholder='Address' className='border p-3 rounded-lg border-black' id='address'  required/> 
-                <div className='flex gap-6 flex-wrap'>
-                    <div className='flex gap-2'>
-                        <input type='checkbox' id='sale' className='w-5 border-black'/>
-                        <span className='text-xl'>Sell</span>
-                    </div>
-                    <div className='flex gap-2'>
-                        <input type='checkbox' id='rent' className='w-5 border-black'/>
-                        <span className='text-xl'>Rent</span>
+        {/* RIGHT */}
+        <div className="flex flex-col flex-1">
+          <p className="font-semibold text-lg">
+            Images:
+            <span className="font-normal ml-2">
+              The first image will be the cover (max 6)
+            </span>
+          </p>
 
-                    </div>
-                    <div className='flex gap-2'>
-                        <input type='checkbox' id='parking' className='w-5 border-black '/>
-                        <span className='text-xl'>Parking</span>
+          <div className="flex gap-4 mb-4 mt-3">
+            <input
+              onChange={(e) => setFiles(e.target.files)}
+              className="p-3 border border-black rounded w-full"
+              type="file"
+              accept="image/*"
+              multiple
+            />
 
-                    </div>
-                    <div className='flex gap-2'>
-                        <input type='checkbox' id='furnished' className='w-5 border-black '/>
-                        <span className='text-xl'>Furnished</span>
+            <button
+              type="button"
+              onClick={handleImageSubmit}
+              className="p-3 bg-[#022222] text-white rounded-lg uppercase"
+            >
+              {uploading ? "Uploading..." : "Upload"}
+            </button>
+          </div>
 
-                    </div>
-                    <div className='flex gap-2'>
-                        <input type='checkbox' id='offer' className='w-5 border-black '/>
-                        <span className='text-xl'>Offer</span>
+          {/* SHOW UPLOADED IMAGES */}
+          {imageUrls.length > 0 &&
+            imageUrls.map((url, index) => (
+              <div key={index} className="flex items-center gap-4 mb-2">
+                <img
+                  src={url}
+                  alt="listing"
+                  className="w-20 h-20 object-cover rounded-lg"
+                />
+                <span className="text-sm">{url}</span>
+              </div>
+            ))}
 
-                    </div>
-
-                </div>
-            
-            <div className='flex flex-wrap gap-6'>
-                <div className='flex items-center gap-2'>
-                    <input type="number" id='bedrooms' min='1' max='10' className='border p-3 border-black rounded-lg' required/>
-                    <p className='text-xl'>Beds</p>
-                </div>
-
-                <div className='flex items-center gap-2'>
-
-                    <input type="number" id='baths' min='1' max='10' className='border p-3 border-black rounded-lg' required/>
-                    <p className='text-xl'>Baths</p>
-               
-                </div>
-
-                <div className='flex items-center gap-2'>
-                  
-                    <input type="number" id='regularprice' min='1' max='10' className='border p-3 border-black rounded-lg' required/>
-                 
-                 <div className='flex flex-col items-center'>
-                    <p className='text-xl'>Regular Price</p>
-                    <span className='text-xs '>($ / month)</span>
-                </div>
-                </div>
-
-                <div className='flex items-center gap-2'>
-                    <input type="number" id='discountprice' min='1' max='10' className='border p-3 border-black rounded-lg' required/>
-                  
-                  <div className='flex flex-col items-center'>
-                    <p className='text-xl'>Discount Price</p>
-                    <span className='text-xs '>($ / month)</span>
-                  </div>
-                </div>
-            </div>
-            
-            
-            </div>
-
-            {/*right part*/}
-            <div className='flex flex-col flex-1'>
-               <p className='font-semibold text-lg'>Images:
-                <span className='font-normal ml-2'>The first image will be the cover (max 6)</span>
-               </p>
-
-               <div className='flex gap-4 mb-4 mt-3'>
-                 <input className='p-3 border border-black rounded w-full' type="file" id='images' accept='image/*' multiple/>
-                 <button className="p-3 bg-[#022222] text-white rounded-lg uppercase hover:opacity-87">Upload</button>
-               </div>
-               
-                <button className='p-3 bg-[#022222] text-white rounded-lg uppercase hover:opacity-87'>Create Listing</button>
-        
-            </div>
-           
-        </form>
-  
-    
-    
-    
-    
-    
-    
-    
+          <button className="p-3 bg-[#022222] text-white rounded-lg uppercase">
+            Create Listing
+          </button>
+        </div>
+      </form>
     </main>
+  );
+};
 
-)}
-
-export default CreateListing
+export default CreateListing;

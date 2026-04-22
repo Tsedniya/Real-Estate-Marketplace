@@ -12,7 +12,7 @@ Users can sign up, sign in (including Google OAuth), browse property listings, c
 * **React**
 * **React Router**
 * **Redux Toolkit**
-* **Firebase Authentication** (Google Sign-In)
+* **Firebase Authentication** 
 * **Tailwind CSS**
 
 ### Backend

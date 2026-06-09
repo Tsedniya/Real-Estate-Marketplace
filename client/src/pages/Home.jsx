@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div >
 
- 
+    <h1>HOME ALONE</h1>
 
     </div>
   )

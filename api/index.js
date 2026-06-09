@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import path from "path";
 
+
 dotenv.config();
 
 mongoose.connect(process.env.MONGO)
@@ -31,7 +32,8 @@ app.use(cookieParser());
 app.use('/api/user', userRoutes)
 app.use('/api/auth', authRoutes) 
 app.use('/api/listing', listingRoutes);
-app.use("/api/upload", uploadRoute);
+app.use("/upload", uploadRoute);
+
 
 // error handler
 app.use((err, req, res, next) => {

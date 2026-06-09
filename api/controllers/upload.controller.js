@@ -1,22 +1,25 @@
-export const uploadImage = async (req, res, next) => {
+import User from "../models/user.js";
+
+export const updateUser = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
+    const { username, email, password } = req.body;
+
+    const updateData = { username, email };
+    if (password) updateData.password = password;
+
+    if (req.file) {
+      // this is the uploaded image
+      updateData.avatar = `http://localhost:3000/uploads/${req.file.filename}`;
     }
 
-    const filePath = `/uploads/${req.file.filename}`;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
 
-    // only try to update user if req.user exists
-    if (req.user) {
-      await User.findByIdAndUpdate(req.user._id, { avatar: filePath });
-    }
-
-    return res.status(200).json({
-      message: "Upload successful",
-      filePath,
-    });
+    res.status(200).json(updatedUser);
   } catch (err) {
-    console.error("Upload error:", err);
-    return res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };

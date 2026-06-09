@@ -1,3 +1,66 @@
 @import "tailwindcss";
+@import "@fontsource-variable/geist";
 
-@import './Fanta.css';
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+@theme inline {
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+
+  --radius: 0.75rem;
+
+  /* map colors into Tailwind system */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+/* ====================== REAL ESTATE LIGHT THEME ====================== */
+
+:root {
+  --background: oklch(0.985 0.005 240);
+  --foreground: oklch(0.12 0.02 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.02 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.02 240);
+
+  --primary: oklch(0.48 0.18 235);     /* Professional blue */
+  --primary-foreground: oklch(0.98 0 0);
+
+  --secondary: oklch(0.96 0.01 240);
+  --secondary-foreground: oklch(0.2 0.02 240);
+
+  --muted: oklch(0.96 0.01 240);
+  --muted-foreground: oklch(0.55 0.02 240);
+
+  --accent: oklch(0.92 0.08 200);
+  --accent-foreground: oklch(0.15 0.02 240);
+
+  --destructive: oklch(0.65 0.22 25);
+  --border: oklch(0.92 0.01 240);
+  --input: oklch(0.97 0.01 240);
+  --ring: oklch(0.48 0.18 235);
+}

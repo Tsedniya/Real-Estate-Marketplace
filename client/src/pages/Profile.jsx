@@ -1,6 +1,16 @@
 import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {signOutUserStart,signOutUserSuccess,signOutUserFailure,deleteUserFailure,deleteUserSuccess,deleteUserStart,updateUserFailure,updateUserSuccess,updateUserStart,} from "../redux/user/userSlice";
+import { 
+  signOutUserStart, 
+  signOutUserSuccess, 
+  signOutUserFailure, 
+  deleteUserFailure, 
+  deleteUserSuccess, 
+  deleteUserStart, 
+  updateUserFailure, 
+  updateUserSuccess, 
+  updateUserStart 
+} from "../redux/user/userSlice";
 import { Link } from "react-router-dom";
 
 const Profile = () => {
@@ -12,7 +22,9 @@ const Profile = () => {
   const [preview, setPreview] = useState(null);
   const fileRef = useRef(null);
 
-  // handle text input
+  const primaryColor = "#022222";
+
+  // Handle text input
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -20,29 +32,29 @@ const Profile = () => {
     });
   };
 
-  // handle image selection
+  // Handle image selection
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
 
-    setFile(file);
-    setPreview(URL.createObjectURL(file));
+    setFile(selectedFile);
+    setPreview(URL.createObjectURL(selectedFile));
     setFormData((prev) => ({
       ...prev,
-      avatar: URL.createObjectURL(file), // for preview
+      avatar: URL.createObjectURL(selectedFile),
     }));
   };
 
-  // update profile (text fields + optional image)
+  // Update profile
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
 
       const data = new FormData();
-      data.append("username", formData.username || currentUser.username);
-      data.append("email", formData.email || currentUser.email);
-      data.append("password", formData.password || "");
+      if (formData.username) data.append("username", formData.username);
+      if (formData.email) data.append("email", formData.email);
+      if (formData.password) data.append("password", formData.password);
       if (file) data.append("image", file);
 
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -66,32 +78,25 @@ const Profile = () => {
     }
   };
 
-  // delete user
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method: "DELETE",
-      });
-
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, { method: "DELETE" });
       const data = await res.json();
+
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
-
       dispatch(deleteUserSuccess(data));
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
   };
 
-  // sign out
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-
       const res = await fetch("/api/auth/signout");
       const data = await res.json();
 
@@ -99,105 +104,129 @@ const Profile = () => {
         dispatch(signOutUserFailure(data.message));
         return;
       }
-
       dispatch(signOutUserSuccess(data));
-      setFormData({});
-      setFile(null);
-      setPreview(null);
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
     }
   };
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="my-3 text-3xl text-center font-semibold">Profile</h1>
+    <main className="min-h-screen bg-slate-50 py-8 px-4">
+      <div className="max-w-lg mx-auto">
+        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-slate-100">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900 mb-2">
+              My Profile
+            </h1>
+            <p className="text-slate-600">Manage your account information</p>
+          </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* PROFILE IMAGE */}
-        <img
-          src={preview || currentUser.avatar}
-          alt="profile"
-          className="rounded-full h-24 w-24 object-cover self-center mb-2 border cursor-pointer"
-          onClick={() => fileRef.current.click()}
-        />
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Profile Image */}
+            <div className="flex flex-col items-center">
+              <div 
+                className="relative cursor-pointer group"
+                onClick={() => fileRef.current.click()}
+              >
+                <img
+                  src={preview || currentUser?.avatar}
+                  alt="profile"
+                  className="rounded-3xl h-32 w-32 object-cover ring-4 ring-slate-100 group-hover:ring-[#022222] transition-all"
+                />
+               
+              </div>
+              <p className="text-xs text-slate-500 mt-3">Click to change photo</p>
 
-        {/* FILE INPUT */}
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileRef}
-          onChange={handleImageChange}
-          className="hidden"
-        />
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileRef}
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </div>
 
-        {/* USERNAME */}
-        <input
-          className="border p-3 rounded-lg w-full"
-          id="username"
-          type="text"
-          value={formData.username ?? currentUser.username}
-          placeholder="Username"
-          onChange={handleChange}
-        />
+            {/* Form Fields */}
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Username</label>
+                <input
+                  className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
+                  id="username"
+                  type="text"
+                  value={formData.username ?? (currentUser?.username || "")}
+                  placeholder="Username"
+                  onChange={handleChange}
+                />
+              </div>
 
-        {/* EMAIL */}
-        <input
-          className="border p-3 rounded-lg w-full"
-          id="email"
-          type="email"
-          value={formData.email ?? currentUser.email}
-          placeholder="Email"
-          onChange={handleChange}
-        />
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                <input
+                  className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
+                  id="email"
+                  type="email"
+                  value={formData.email ?? (currentUser?.email || "")}
+                  placeholder="Email"
+                  onChange={handleChange}
+                />
+              </div>
 
-        {/* PASSWORD */}
-        <input
-          className="border p-3 rounded-lg w-full"
-          id="password"
-          type="password"
-          value={formData.password || ""}
-          placeholder="New password"
-          onChange={handleChange}
-        />
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">New Password</label>
+                <input
+                  className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
+                  id="password"
+                  type="password"
+                  value={formData.password || ""}
+                  placeholder="New password (optional)"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-        {/* UPDATE BUTTON */}
-        <button
-          disabled={loading}
-          className="border p-3 rounded-lg w-full bg-white hover:bg-[#191970] hover:text-white uppercase"
-        >
-          {loading ? "Loading..." : "Update"}
-        </button>
+            {/* Update Button */}
+            <button
+              disabled={loading}
+              className="w-full py-4 rounded-2xl text-white font-semibold text-lg tracking-widest transition-all hover:brightness-110 active:scale-[0.985] shadow-lg disabled:opacity-70"
+              style={{ backgroundColor: primaryColor }}
+            >
+              {loading ? "Updating..." : "Update Profile"}
+            </button>
 
-        {/* CREATE LISTING */}
-        <Link
-          to={"create-listing"}
-          className="bg-white border p-3 rounded-lg uppercase text-center hover:bg-[#191970] hover:text-white"
-        >
-          Create Listing
-        </Link>
-      </form>
+            {/* Create Listing Link */}
+            <Link
+              to="/create-listing"
+              className="w-full py-4 border border-slate-300 hover:border-[#022222] hover:text-[#022222] rounded-2xl text-center font-semibold transition-all block"
+            >
+              Create New Listing
+            </Link>
+          </form>
 
-      {/* ACTIONS */}
-      <div className="flex justify-between mt-5">
-        <span
-          onClick={handleDeleteUser}
-          className="text-[#191970] cursor-pointer"
-        >
-          Delete account
-        </span>
+          {/* Danger Zone */}
+          <div className="flex justify-between mt-10 pt-6 border-t border-slate-100 text-sm">
+            <span
+              onClick={handleDeleteUser}
+              className="text-red-600 hover:text-red-700 cursor-pointer font-medium transition"
+            >
+              Delete Account
+            </span>
 
-        <span
-          onClick={handleSignOut}
-          className="text-[#191970] cursor-pointer"
-        >
-          Sign out
-        </span>
+            <span
+              onClick={handleSignOut}
+              className="text-slate-600 hover:text-slate-900 cursor-pointer font-medium transition"
+            >
+              Sign Out
+            </span>
+          </div>
+
+          {error && (
+            <p className="text-red-500 text-center mt-6 text-sm font-medium">{error}</p>
+          )}
+        </div>
       </div>
-
-      {/* ERROR */}
-      <p className="text-red-500 mt-5">{error || ""}</p>
-    </div>
+    </main>
   );
 };
 

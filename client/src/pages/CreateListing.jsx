@@ -4,6 +4,18 @@ const CreateListing = () => {
   const [files, setFiles] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    address: "",
+  });
+
+  const primaryColor = "#022222";
+
+  // Handle form input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
   // upload all selected images
   const handleImageSubmit = async () => {
@@ -17,19 +29,15 @@ const CreateListing = () => {
     try {
       setUploading(true);
 
-      const promises = [];
-
-      for (let i = 0; i < files.length; i++) {
-        promises.push(storeImage(files[i]));
-      }
-
+      const promises = files.map((file) => storeImage(file));
       const urls = await Promise.all(promises);
 
       setImageUrls((prev) => [...prev, ...urls]);
-
-      setUploading(false);
+      setFiles([]); // Clear selected files after upload
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      alert("Failed to upload one or more images");
+    } finally {
       setUploading(false);
     }
   };
@@ -37,7 +45,7 @@ const CreateListing = () => {
   // upload single image
   const storeImage = async (file) => {
     const data = new FormData();
-    data.append("image", file); // must match multer
+    data.append("image", file);
 
     const res = await fetch("/api/upload", {
       method: "POST",
@@ -54,84 +62,176 @@ const CreateListing = () => {
     return result.filePath;
   };
 
+  const handleRemoveImage = (index) => {
+    setImageUrls(imageUrls.filter((_, i) => i !== index));
+  };
+
   return (
-    <main className="p-3 max-w-4xl mx-auto">
-      <h1 className="md:text-5xl text-3xl font-semibold text-center my-7 py-5">
-        Create a Listing
-      </h1>
-
-      <form className="flex flex-col sm:flex-row gap-12">
-        {/* LEFT */}
-        <div className="flex flex-col gap-4 flex-1">
-          <input
-            type="text"
-            placeholder="Name"
-            className="border p-3 rounded-lg border-black"
-            id="name"
-            required
-          />
-
-          <textarea
-            placeholder="Description"
-            className="border p-3 rounded-lg border-black"
-            id="description"
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Address"
-            className="border p-3 rounded-lg border-black"
-            id="address"
-            required
-          />
-        </div>
-
-        {/* RIGHT */}
-        <div className="flex flex-col flex-1">
-          <p className="font-semibold text-lg">
-            Images:
-            <span className="font-normal ml-2">
-              The first image will be the cover (max 6)
-            </span>
-          </p>
-
-          <div className="flex gap-4 mb-4 mt-3">
-            <input
-              onChange={(e) => setFiles(e.target.files)}
-              className="p-3 border border-black rounded w-full"
-              type="file"
-              accept="image/*"
-              multiple
-            />
-
-            <button
-              type="button"
-              onClick={handleImageSubmit}
-              className="p-3 bg-[#022222] text-white rounded-lg uppercase"
-            >
-              {uploading ? "Uploading..." : "Upload"}
-            </button>
+    <main className="min-h-screen bg-slate-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div 
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            style={{ backgroundColor: primaryColor }}
+          >
+            <span className="text-white text-3xl">🏠</span>
           </div>
-
-          {/* SHOW UPLOADED IMAGES */}
-          {imageUrls.length > 0 &&
-            imageUrls.map((url, index) => (
-              <div key={index} className="flex items-center gap-4 mb-2">
-                <img
-                  src={url}
-                  alt="listing"
-                  className="w-20 h-20 object-cover rounded-lg"
-                />
-                <span className="text-sm">{url}</span>
-              </div>
-            ))}
-
-          <button className="p-3 bg-[#022222] text-white rounded-lg uppercase">
-            Create Listing
-          </button>
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">
+            Create a <span className="text-blue-600">Listing</span>
+          </h1>
+          <p className="mt-3 text-slate-600 max-w-md mx-auto">
+            Fill in the details and showcase your property with beautiful images
+          </p>
         </div>
-      </form>
+
+        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+          <form className="flex flex-col lg:flex-row">
+            {/* LEFT - Details */}
+            <div className="flex-1 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-slate-100">
+              <div className="space-y-8">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Property Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Modern Villa with Ocean View"
+                    className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all text-lg"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Describe your property in detail..."
+                    rows={6}
+                    className="w-full px-5 py-4 border border-slate-200 rounded-3xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all resize-y min-h-[140px]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="123 Sunset Boulevard, Malibu, CA"
+                    className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT - Images & Submit */}
+            <div className="flex-1 p-8 lg:p-12 bg-slate-50">
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="font-semibold text-lg text-slate-900">
+                    Property Images
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    First image is cover • Max 6
+                  </p>
+                </div>
+
+                {/* Upload Area */}
+                <div className="border-2 border-dashed border-slate-300 rounded-3xl p-8 hover:border-[#022222] transition-colors bg-white">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+                      📸
+                    </div>
+                    <p className="font-medium text-slate-700">Drag images or click to upload</p>
+                    <p className="text-sm text-slate-500 mt-1">JPG, PNG • Max 6 images</p>
+                    
+                    <input
+                      onChange={(e) => setFiles(e.target.files)}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="mt-6 px-8 py-3.5 border border-slate-300 hover:border-[#022222] hover:text-[#022222] rounded-2xl cursor-pointer transition-all text-sm font-medium"
+                    >
+                      Choose Images
+                    </label>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleImageSubmit}
+                  disabled={uploading || files.length === 0}
+                  className="mt-4 w-full py-4 rounded-2xl text-white font-semibold text-sm uppercase tracking-widest transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {uploading ? "Uploading Images..." : "Upload Selected Images"}
+                </button>
+              </div>
+
+              {/* Uploaded Images Preview */}
+              {imageUrls.length > 0 && (
+                <div className="mb-10">
+                  <p className="text-sm font-medium text-slate-500 mb-4">Uploaded Images ({imageUrls.length}/6)</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    {imageUrls.map((url, index) => (
+                      <div key={index} className="group relative">
+                        <img
+                          src={url}
+                          alt={`Preview ${index}`}
+                          className="w-full aspect-square object-cover rounded-2xl shadow-sm ring-1 ring-slate-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
+                        {index === 0 && (
+                          <div className="absolute top-2 left-2 bg-[#022222] text-white text-[10px] px-2 py-0.5 rounded font-medium">
+                            COVER
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Create Button */}
+              <button
+                type="submit"
+                className="w-full py-2 rounded-3xl text-white font-semibold text-Xl tracking-wide hover:brightness-110 active:scale-[0.985] transition-all shadow-lg"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Create Listing
+              </button>
+
+              <p className="text-center text-xs text-slate-500 mt-6">
+                Your listing will be reviewed before going live
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
     </main>
   );
 };

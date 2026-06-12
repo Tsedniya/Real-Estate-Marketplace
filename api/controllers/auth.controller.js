@@ -11,7 +11,12 @@ export const signup = async(req, res, next) => {
   const newUser = new User({username, email, password:hashedPassword})
   try{
       await newUser.save()
-      res.status(201).json('user created!')
+      const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
+      const {password:pass, ...rest} = newUser._doc;
+      res
+      .cookie('access_token', token, {httpOnly: true})
+      .status(201)
+      .json(rest);
   }catch(error){
      next(error)
   }

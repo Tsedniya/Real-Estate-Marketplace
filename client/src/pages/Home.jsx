@@ -19,7 +19,7 @@ const Home = () => {
         <div className="relative max-w-6xl mx-auto px-6 pt-24 pb-20 text-center text-white z-10">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter leading-tight mb-6">
-              Find Your Dream Home
+              <span className="text-blue-500">Find Your</span> <span className='text-slate-900'>Dream Home</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-200 mb-12 max-w-xl mx-auto">
               Premium properties • Expert service • Trusted by thousands
@@ -27,22 +27,23 @@ const Home = () => {
 
             {/* Main CTA */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                to="/create-listing"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-3xl text-lg font-semibold text-white hover:brightness-110 active:scale-[0.97] transition-all shadow-xl"
-                style={{ backgroundColor: primaryColor }}
-              >
-                Let's Start Now
-                <span className="text-2xl">→</span>
-              </Link>
+            {/* Primary Button */}
+            <Link
+              to="/create-listing"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 active:scale-95 transition-all shadow-lg hover:shadow-xl"
+            >
+              Let's Start Now
+              <span className="text-2xl">→</span>
+            </Link>
 
-              <Link
-                to="/search"
-                className="inline-flex items-center gap-3 px-8 py-5 rounded-3xl text-lg font-semibold border-2 border-white/80 hover:bg-white/10 transition-all"
-              >
-                Browse Properties
-              </Link>
-            </div>
+            {/* Secondary Button */}
+            <Link
+              to="/search"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-lg font-semibold border-2 border-white text-white hover:bg-white/10 transition-all"
+            >
+              Browse Properties
+            </Link>
+          </div>
           </div>
         </div>
 

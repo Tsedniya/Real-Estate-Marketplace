@@ -18,13 +18,14 @@ mongoose.connect(process.env.MONGO)
 
 const app = express()
 
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5176'],
+    credentials: true,
+  })
+);
 // serve uploaded files
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174","http://localhost:5176"],
-  credentials: true
-}));
 
 app.use(express.json());  
 app.use(cookieParser());
@@ -46,8 +47,6 @@ app.use((err, req, res, next) => {
   });
 })
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`server is running on port ${PORT} !!`)
+app.listen(5001, () => {
+  console.log('server is running on port 3000 !!')
 })

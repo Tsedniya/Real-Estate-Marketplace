@@ -4,18 +4,12 @@ const CreateListing = () => {
   const [files, setFiles] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    address: "",
-  });
+  const [formData, setFormData] = useState({ name: "", description: "", address: "", type: "rent", parking: false, furnished: false, offer: false, bedrooms: 1, bathrooms: 1, regularPrice: 50, discountPrice: 0, });
 
   const primaryColor = "#022222";
 
   // Handle form input changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
+  const handleChange = (e) => { const { id, value, checked, type } = e.target; setFormData({ ...formData, [id]: type === "checkbox" ? checked : value, }); };
 
   // upload all selected images
   const handleImageSubmit = async () => {
@@ -134,6 +128,7 @@ const CreateListing = () => {
                     required
                   />
                 </div>
+                <div className="space-y-6"> <div className="flex flex-wrap gap-6"> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" checked={formData.type === "sell"} onChange={() => setFormData({ ...formData, type: "sell" }) } className="w-5 h-5" /> <span>Sell</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" checked={formData.type === "rent"} onChange={() => setFormData({ ...formData, type: "rent" }) } className="w-5 h-5" /> <span>Rent</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" id="parking" checked={formData.parking} onChange={handleChange} className="w-5 h-5" /> <span>Parking Spot</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" id="furnished" checked={formData.furnished} onChange={handleChange} className="w-5 h-5" /> <span>Furnished</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" id="offer" checked={formData.offer} onChange={handleChange} className="w-5 h-5" /> <span>Offer</span> </label> </div> {/* Beds and Baths */} <div className="grid grid-cols-2 gap-6"> <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Bedrooms </label> <input type="number" id="bedrooms" min="1" max="10" value={formData.bedrooms} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Bathrooms </label> <input type="number" id="bathrooms" min="1" max="10" value={formData.bathrooms} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> </div> {/* Prices */} <div className="grid grid-cols-2 gap-6"> <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Regular Price ($) </label> <input type="number" id="regularPrice" min="50" value={formData.regularPrice} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> {formData.offer && ( <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Discount Price ($) </label> <input type="number" id="discountPrice" min="0" value={formData.discountPrice} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> )} </div> </div>
               </div>
             </div>
 
@@ -159,7 +154,7 @@ const CreateListing = () => {
                     <p className="text-sm text-slate-500 mt-1">JPG, PNG • Max 6 images</p>
                     
                     <input
-                      onChange={(e) => setFiles(e.target.files)}
+                      onChange={(e) => setFiles(Array.from(e.target.files))}
                       type="file"
                       accept="image/*"
                       multiple

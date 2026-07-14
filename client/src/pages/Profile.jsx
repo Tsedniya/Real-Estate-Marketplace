@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { uploadToSupabase } from "../components/uploadToSupabase";
 import { 
   signOutUserStart, 
   signOutUserSuccess, 
@@ -47,61 +48,74 @@ const Profile = () => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
+  
     setFile(selectedFile);
     setPreview(URL.createObjectURL(selectedFile));
-    setFormData((prev) => ({
-      ...prev,
-      avatar: URL.createObjectURL(selectedFile),
-    }));
   };
 
   // Update profile
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      dispatch(updateUserStart());
-      setProgress(0);
-      setSuccessMessage("");
 
-      const data = new FormData();
-      if (formData.username) data.append("username", formData.username);
-      if (formData.email) data.append("email", formData.email);
-      if (formData.password) data.append("password", formData.password);
-      if (file) data.append("image", file);
+    dispatch(updateUserStart());
+    setSuccessMessage("");
 
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) return prev;
-          return prev + Math.random() * 30;
-        });
-      }, 300);
-
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: "PUT",
-        body: data,
-        credentials: "include",
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) return prev;
+        return prev + Math.random() * 30;
       });
+    }, 300);
 
-      clearInterval(progressInterval);
-      setProgress(100);
+    try {
+      let avatarUrl = currentUser.avatar;
 
-      const result = await res.json();
-      if (result.success === false) {
-        dispatch(updateUserFailure(result.message));
-        setProgress(0);
-        return;
+      if (file) {
+        avatarUrl = await uploadToSupabase(file);
+
+        if (!avatarUrl) {
+          throw new Error("Image upload failed");
+        }
       }
 
+      const data = {
+        avatar: avatarUrl,
+      };
+
+      if (formData.username) data.username = formData.username;
+      if (formData.email) data.email = formData.email;
+      if (formData.password) data.password = formData.password;
+
+      const res = await fetch(
+        `/api/user/update/${currentUser._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(data),
+        }
+      );
+
+      const result = await res.json();
+
+      if (result.success === false) {
+        throw new Error(result.message);
+      }
+
+      setProgress(100);
       dispatch(updateUserSuccess(result));
+
       setFormData({});
       setFile(null);
       setPreview(null);
       setSuccessMessage("✓ Profile updated successfully!");
-      setProgress(0);
     } catch (err) {
       dispatch(updateUserFailure(err.message));
-      setProgress(0);
+    } finally {
+      clearInterval(progressInterval);
+      setTimeout(() => setProgress(0), 500);
     }
   };
 

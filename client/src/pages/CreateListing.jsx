@@ -1,69 +1,168 @@
 import React, { useState } from "react";
+import { uploadToSupabase } from "../components/uploadToSupabase";
+import { useSelector } from "react-redux";
 
 const CreateListing = () => {
-  const [files, setFiles] = useState([]);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [file, setFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     address: "",
+    type: "rent",
+    parking: false,
+    furnished: false,
+    offer: false,
+    bedrooms: 1,
+    bathrooms: 1,
+    regularPrice: 50,
+    discountPrice: 0,
   });
+
+  const { currentUser } = useSelector((state) => state.user);
 
   const primaryColor = "#022222";
 
+
   // Handle form input changes
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
+    const { id, value, checked, type } = e.target;
 
-  // upload all selected images
-  const handleImageSubmit = async () => {
-    if (files.length === 0) return;
-
-    if (files.length > 6) {
-      alert("You can upload max 6 images");
-      return;
-    }
-
-    try {
-      setUploading(true);
-
-      const promises = files.map((file) => storeImage(file));
-      const urls = await Promise.all(promises);
-
-      setImageUrls((prev) => [...prev, ...urls]);
-      setFiles([]); // Clear selected files after upload
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload one or more images");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // upload single image
-  const storeImage = async (file) => {
-    const data = new FormData();
-    data.append("image", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: data,
-      credentials: "include",
+    setFormData({
+      ...formData,
+      [id]:
+        type === "checkbox"
+          ? checked
+          : type === "number"
+          ? Number(value)
+          : value,
     });
+  };
 
-    const result = await res.json();
 
-    if (result.message !== "Upload successful") {
+  // Upload one image to Supabase
+  const storeImage = async (file) => {
+    const url = await uploadToSupabase(file);
+
+    if (!url) {
       throw new Error("Upload failed");
     }
 
-    return result.filePath;
+    return url;
   };
 
-  const handleRemoveImage = (index) => {
-    setImageUrls(imageUrls.filter((_, i) => i !== index));
+
+  // Upload selected images
+   const handleImageSubmit = async () => {
+  if (!file) {
+    alert("Please select an image first");
+    return;
+  }
+
+  try {
+    setUploading(true);
+
+    const url = await storeImage(file);
+
+    setImageUrl(url);
+    setFile(null);
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to upload image");
+
+  } finally {
+    setUploading(false);
+  }
+};
+
+  // Remove uploaded image
+  const handleRemoveImage = () => {
+  setImageUrl("");
+};
+
+
+  // Create listing
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
+
+    if (!currentUser) {
+      alert("Please login first");
+      return;
+    }
+
+
+    if (files.length > 0) {
+      alert("Please upload selected images first");
+      return;
+    }
+
+
+    if (!imageUrl) {
+  alert("Please upload an image");
+  return;
+}
+
+    try {
+
+      const listingData = {
+        ...formData,
+        imageUrl,
+        userRef: currentUser._id,
+      };
+
+
+      console.log(
+        "Listing Data:",
+        listingData
+      );
+
+
+      const res = await fetch(
+        "/api/listing/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify(listingData),
+        }
+      );
+
+
+      const data = await res.json();
+
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Failed to create listing"
+        );
+      }
+
+
+      console.log(
+        "Listing created:",
+        data
+      );
+
+
+      alert(
+        "Listing created successfully!"
+      );
+
+
+    } catch (error) {
+
+      console.log(error);
+      alert(error.message);
+
+    }
+
   };
 
   return (
@@ -86,7 +185,7 @@ const CreateListing = () => {
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-          <form className="flex flex-col lg:flex-row">
+          <form  onSubmit={handleSubmit} className="flex flex-col lg:flex-row">
             {/* LEFT - Details */}
             <div className="flex-1 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-slate-100">
               <div className="space-y-8">
@@ -134,6 +233,7 @@ const CreateListing = () => {
                     required
                   />
                 </div>
+                <div className="space-y-6"> <div className="flex flex-wrap gap-6"> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" checked={formData.type === "sell"} onChange={() => setFormData({ ...formData, type: "sell" }) } className="w-5 h-5" /> <span>Sell</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" checked={formData.type === "rent"} onChange={() => setFormData({ ...formData, type: "rent" }) } className="w-5 h-5" /> <span>Rent</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" id="parking" checked={formData.parking} onChange={handleChange} className="w-5 h-5" /> <span>Parking Spot</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" id="furnished" checked={formData.furnished} onChange={handleChange} className="w-5 h-5" /> <span>Furnished</span> </label> <label className="flex items-center gap-2 cursor-pointer"> <input type="checkbox" id="offer" checked={formData.offer} onChange={handleChange} className="w-5 h-5" /> <span>Offer</span> </label> </div> {/* Beds and Baths */} <div className="grid grid-cols-2 gap-6"> <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Bedrooms </label> <input type="number" id="bedrooms" min="1" max="10" value={formData.bedrooms} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Bathrooms </label> <input type="number" id="bathrooms" min="1" max="10" value={formData.bathrooms} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> </div> {/* Prices */} <div className="grid grid-cols-2 gap-6"> <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Regular Price ($) </label> <input type="number" id="regularPrice" min="50" value={formData.regularPrice} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> {formData.offer && ( <div> <label className="block text-sm font-medium text-slate-700 mb-2"> Discount Price ($) </label> <input type="number" id="discountPrice" min="0" value={formData.discountPrice} onChange={handleChange} className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222]" /> </div> )} </div> </div>
               </div>
             </div>
 
@@ -159,10 +259,9 @@ const CreateListing = () => {
                     <p className="text-sm text-slate-500 mt-1">JPG, PNG • Max 6 images</p>
                     
                     <input
-                      onChange={(e) => setFiles(e.target.files)}
+                      onChange={(e) => setFile(e.target.files[0])}
                       type="file"
                       accept="image/*"
-                      multiple
                       className="hidden"
                       id="file-upload"
                     />
@@ -178,7 +277,7 @@ const CreateListing = () => {
                 <button
                   type="button"
                   onClick={handleImageSubmit}
-                  disabled={uploading || files.length === 0}
+                  disabled={uploading || !file}
                   className="mt-4 w-full py-4 rounded-2xl text-white font-semibold text-sm uppercase tracking-widest transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: primaryColor }}
                 >
@@ -187,34 +286,33 @@ const CreateListing = () => {
               </div>
 
               {/* Uploaded Images Preview */}
-              {imageUrls.length > 0 && (
-                <div className="mb-10">
-                  <p className="text-sm font-medium text-slate-500 mb-4">Uploaded Images ({imageUrls.length}/6)</p>
-                  <div className="grid grid-cols-3 gap-4">
-                    {imageUrls.map((url, index) => (
-                      <div key={index} className="group relative">
-                        <img
-                          src={url}
-                          alt={`Preview ${index}`}
-                          className="w-full aspect-square object-cover rounded-2xl shadow-sm ring-1 ring-slate-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(index)}
-                          className="absolute top-2 right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
-                        >
-                          ✕
-                        </button>
-                        {index === 0 && (
-                          <div className="absolute top-2 left-2 bg-[#022222] text-white text-[10px] px-2 py-0.5 rounded font-medium">
-                            COVER
-                          </div>
-                        )}
-                      </div>
-                    ))}
+              {imageUrl && (
+              <div className="mb-10">
+                <p className="text-sm font-medium text-slate-500 mb-4">
+                  Uploaded Image
+                </p>
+
+                <div className="relative group">
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="w-full aspect-square object-cover rounded-2xl shadow-sm ring-1 ring-slate-200"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+
+                  <div className="absolute top-2 left-2 bg-[#022222] text-white text-[10px] px-2 py-1 rounded">
+                    COVER
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
               {/* Create Button */}
               <button

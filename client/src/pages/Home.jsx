@@ -29,17 +29,17 @@ const Home = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {/* Primary Button */}
             <Link
-              to="/create-listing"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 active:scale-95 transition-all shadow-lg hover:shadow-xl"
-            >
-              Let's Start Now
-              <span className="text-2xl">→</span>
-            </Link>
-
+            to="/create-listing"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl text-base font-semibold text-white bg-blue-500 hover:bg-blue-600 active:scale-95 transition-all shadow-lg hover:shadow-xl"
+          >
+            Let's Start Now
+            <span className="text-xl">→</span>
+          </Link>
             {/* Secondary Button */}
+            
             <Link
               to="/search"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-lg font-semibold border-2 border-white text-white hover:bg-white/10 transition-all"
+              className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl text-base font-semibold border-2 border-white text-white hover:bg-white/10 transition-all"
             >
               Browse Properties
             </Link>
@@ -59,7 +59,7 @@ const Home = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-semibold tracking-tight text-slate-900">
-              Why Tsehay Estate?
+              <span className="text-blue-500">Why</span> Tsehay Estate?
             </h2>
             <p className="text-slate-600 mt-3">Excellence in every property</p>
           </div>

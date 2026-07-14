@@ -42,6 +42,7 @@ const SignIn = () => {
 
       const res = await fetch("/api/auth/signin", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });

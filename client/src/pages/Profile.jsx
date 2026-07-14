@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { uploadToSupabase } from "../components/uploadToSupabase";
 import { 
   signOutUserStart, 
   signOutUserSuccess, 
@@ -20,9 +21,19 @@ const Profile = () => {
   const [formData, setFormData] = useState({});
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [successMessage, setSuccessMessage] = useState("");
   const fileRef = useRef(null);
 
   const primaryColor = "#022222";
+
+  // Clear success message after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   // Handle text input
   const handleChange = (e) => {
@@ -37,51 +48,81 @@ const Profile = () => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
+  
     setFile(selectedFile);
     setPreview(URL.createObjectURL(selectedFile));
-    setFormData((prev) => ({
-      ...prev,
-      avatar: URL.createObjectURL(selectedFile),
-    }));
   };
 
   // Update profile
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      dispatch(updateUserStart());
 
-      const data = new FormData();
-      if (formData.username) data.append("username", formData.username);
-      if (formData.email) data.append("email", formData.email);
-      if (formData.password) data.append("password", formData.password);
-      if (file) data.append("image", file);
+    dispatch(updateUserStart());
+    setSuccessMessage("");
 
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: "PUT",
-        body: data,
-        credentials: "include",
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) return prev;
+        return prev + Math.random() * 30;
       });
+    }, 300);
 
-      const result = await res.json();
-      if (result.success === false) {
-        dispatch(updateUserFailure(result.message));
-        return;
+    try {
+      let avatarUrl = currentUser.avatar;
+
+      if (file) {
+        avatarUrl = await uploadToSupabase(file);
+
+        if (!avatarUrl) {
+          throw new Error("Image upload failed");
+        }
       }
 
+      const data = {
+        avatar: avatarUrl,
+      };
+
+      if (formData.username) data.username = formData.username;
+      if (formData.email) data.email = formData.email;
+      if (formData.password) data.password = formData.password;
+
+      const res = await fetch(
+        `/api/user/update/${currentUser._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(data),
+        }
+      );
+
+      const result = await res.json();
+
+      if (result.success === false) {
+        throw new Error(result.message);
+      }
+
+      setProgress(100);
       dispatch(updateUserSuccess(result));
+
       setFormData({});
       setFile(null);
       setPreview(null);
+      setSuccessMessage("✓ Profile updated successfully!");
     } catch (err) {
       dispatch(updateUserFailure(err.message));
+    } finally {
+      clearInterval(progressInterval);
+      setTimeout(() => setProgress(0), 500);
     }
   };
 
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, { method: "DELETE" });
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, { method: "DELETE", credentials: "include" });
       const data = await res.json();
 
       if (data.success === false) {
@@ -97,7 +138,7 @@ const Profile = () => {
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-      const res = await fetch("/api/auth/signout");
+      const res = await fetch("/api/auth/signout", { credentials: "include" });
       const data = await res.json();
 
       if (data.success === false) {
@@ -186,14 +227,37 @@ const Profile = () => {
               </div>
             </div>
 
+            {/* Progress Bar */}
+            {progress > 0 && (
+              <div className="w-full space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-slate-600">Updating...</span>
+                  <span className="text-sm font-semibold text-slate-700">{Math.min(Math.round(progress), 100)}%</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-[#022222] to-[#044444] h-full rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${Math.min(progress, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
             {/* Update Button */}
             <button
-              disabled={loading}
+              disabled={loading || progress > 0}
               className="w-full py-4 rounded-2xl text-white font-semibold text-lg tracking-widest transition-all hover:brightness-110 active:scale-[0.985] shadow-lg disabled:opacity-70"
               style={{ backgroundColor: primaryColor }}
             >
               {loading ? "Updating..." : "Update Profile"}
             </button>
+
+            {/* Success Message */}
+            {successMessage && (
+              <div className="w-full p-4 bg-green-50 border border-green-200 rounded-2xl">
+                <p className="text-green-700 font-medium text-center text-sm">{successMessage}</p>
+              </div>
+            )}
 
             {/* Create Listing Link */}
             <Link

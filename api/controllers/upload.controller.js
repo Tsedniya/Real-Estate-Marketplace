@@ -1,4 +1,4 @@
-import User from "../models/user.js";
+import User from "../models/user.model.js";
 
 export const updateUser = async (req, res) => {
   try {
@@ -21,5 +21,17 @@ export const updateUser = async (req, res) => {
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Upload single image for listings — returns { message, filePath }
+export const uploadFile = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+    const filePath = `http://localhost:3000/uploads/${req.file.filename}`;
+    return res.status(200).json({ message: 'Upload successful', filePath });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
 };

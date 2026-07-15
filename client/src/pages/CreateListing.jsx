@@ -96,10 +96,10 @@ const CreateListing = () => {
     }
 
 
-    if (files.length > 0) {
-      alert("Please upload selected images first");
-      return;
-    }
+    if (file && !imageUrl) {
+    alert("Please upload selected image first");
+    return;
+  }
 
 
     if (!imageUrl) {

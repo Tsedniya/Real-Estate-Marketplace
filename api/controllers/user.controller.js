@@ -15,7 +15,9 @@ export const updateUser = async(req, res, next)=>{
       if (req.body.username) updateData.username = req.body.username;
       if (req.body.email) updateData.email = req.body.email;
       if (req.body.password) updateData.password = bcryptjs.hashSync(req.body.password, 10);
-      if (req.file) {
+      if (req.body.avatar) {
+        updateData.avatar = req.body.avatar;
+      } else if (req.file) {
         updateData.avatar = `http://localhost:3000/uploads/${req.file.filename}`;
       }
 

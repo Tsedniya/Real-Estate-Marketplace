@@ -1,37 +1,47 @@
 import User from "../models/user.model.js";
+import bcryptjs from "bcryptjs";
 
 export const updateUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    console.log("BODY:", req.body);
 
-    const updateData = { username, email };
-    if (password) updateData.password = password;
+    const updateData = {};
 
-    if (req.file) {
-      // this is the uploaded image
-      updateData.avatar = `http://localhost:3000/uploads/${req.file.filename}`;
-    }
+    if (req.body.username)
+      updateData.username = req.body.username;
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    if (req.body.email)
+      updateData.email = req.body.email;
+
+    if (req.body.avatar)
+      updateData.avatar = req.body.avatar;
+
+    if (req.body.password)
+      updateData.password = bcryptjs.hashSync(
+        req.body.password,
+        10
+      );
+
+    console.log("UPDATE DATA:", updateData);
+
+    const updatedUser =
+      await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: updateData,
+        },
+        { new: true }
+      );
+
+    console.log("UPDATED USER:", updatedUser);
 
     res.status(200).json(updatedUser);
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
 
-// Upload single image for listings — returns { message, filePath }
-export const uploadFile = async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
-
-    const filePath = `http://localhost:3000/uploads/${req.file.filename}`;
-    return res.status(200).json({ message: 'Upload successful', filePath });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };

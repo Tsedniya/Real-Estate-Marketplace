@@ -244,9 +244,6 @@ const CreateListing = () => {
                   <p className="font-semibold text-lg text-slate-900">
                     Property Images
                   </p>
-                  <p className="text-sm text-slate-500">
-                    First image is cover • Max 6
-                  </p>
                 </div>
 
                 {/* Upload Area */}
@@ -256,7 +253,7 @@ const CreateListing = () => {
                       📸
                     </div>
                     <p className="font-medium text-slate-700">Drag images or click to upload</p>
-                    <p className="text-sm text-slate-500 mt-1">JPG, PNG • Max 6 images</p>
+                    <p className="text-sm text-slate-500 mt-1">JPG, PNG </p>
                     
                     <input
                       onChange={(e) => setFile(e.target.files[0])}

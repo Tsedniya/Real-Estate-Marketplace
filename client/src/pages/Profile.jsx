@@ -54,70 +54,70 @@ const Profile = () => {
   };
 
   // Update profile
-    const handleSubmit = async (e) => {
-    e.preventDefault();
+   const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    dispatch(updateUserStart());
-    setSuccessMessage("");
+  dispatch(updateUserStart());
 
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) return prev;
-        return prev + Math.random() * 30;
-      });
-    }, 300);
+  try {
+    let avatarUrl = currentUser.avatar;
 
-    try {
-      let avatarUrl = currentUser.avatar;
+    if (file) {
+      avatarUrl = await uploadToSupabase(file);
 
-      if (file) {
-        avatarUrl = await uploadToSupabase(file);
+      console.log("New avatar URL:", avatarUrl);
 
-        if (!avatarUrl) {
-          throw new Error("Image upload failed");
-        }
+      if (!avatarUrl) {
+        throw new Error("Image upload failed");
       }
-
-      const data = {
-        avatar: avatarUrl,
-      };
-
-      if (formData.username) data.username = formData.username;
-      if (formData.email) data.email = formData.email;
-      if (formData.password) data.password = formData.password;
-
-      const res = await fetch(
-        `/api/user/update/${currentUser._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(data),
-        }
-      );
-
-      const result = await res.json();
-
-      if (result.success === false) {
-        throw new Error(result.message);
-      }
-
-      setProgress(100);
-      dispatch(updateUserSuccess(result));
-
-      setFormData({});
-      setFile(null);
-      setPreview(null);
-      setSuccessMessage("✓ Profile updated successfully!");
-    } catch (err) {
-      dispatch(updateUserFailure(err.message));
-    } finally {
-      clearInterval(progressInterval);
-      setTimeout(() => setProgress(0), 500);
     }
-  };
+
+    const data = {
+      avatar: avatarUrl,
+    };
+
+    if (formData.username)
+      data.username = formData.username;
+
+    if (formData.email)
+      data.email = formData.email;
+
+    if (formData.password)
+      data.password = formData.password;
+
+    console.log("Sending data:", data);
+
+    const res = await fetch(
+      `/api/user/update/${currentUser._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      }
+    );
+
+    const result = await res.json();
+
+    console.log("Response:", result);
+
+    if (!res.ok) {
+      throw new Error(result.message);
+    }
+
+    dispatch(updateUserSuccess(result));
+
+    setSuccessMessage(
+      "✓ Profile updated successfully!"
+    );
+
+  } catch (err) {
+    console.log(err);
+    dispatch(updateUserFailure(err.message));
+  }
+};
 
   const handleDeleteUser = async () => {
     try {

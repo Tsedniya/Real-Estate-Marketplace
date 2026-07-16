@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { uploadToSupabase } from "../components/uploadToSupabase";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const CreateListing = () => {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,8 +23,6 @@ const CreateListing = () => {
     regularPrice: 50,
     discountPrice: 0,
   });
-
-  const { currentUser } = useSelector((state) => state.user);
 
   const primaryColor = "#022222";
 
@@ -145,23 +146,19 @@ const CreateListing = () => {
       }
 
 
-      console.log(
-        "Listing created:",
-        data
-      );
+      console.log("Listing created:", data);
+
+      alert("Listing created successfully!");
+
+      navigate(`/listing/${data._id}`);
 
 
-      alert(
-        "Listing created successfully!"
-      );
+          } catch (error) {
 
+            console.log(error);
+            alert(error.message);
 
-    } catch (error) {
-
-      console.log(error);
-      alert(error.message);
-
-    }
+          }
 
   };
 

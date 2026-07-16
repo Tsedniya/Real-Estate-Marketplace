@@ -29,6 +29,9 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.get("/", (req, res) => {
+  res.send("Real Estate API is running 🚀");
+});
 
 
 app.use("/api/user", userRoutes);
@@ -49,6 +52,8 @@ app.use((err, req, res, next) => {
 });
 
 
-app.listen(5001, () => {
-  console.log("server is running on port 5001");
+const PORT = process.env.PORT || 5001;
+
+app.listen(PORT, () => {
+  console.log(`server is running on port ${PORT}`);
 });

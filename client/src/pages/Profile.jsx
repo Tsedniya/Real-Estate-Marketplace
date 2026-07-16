@@ -151,6 +151,16 @@ const Profile = () => {
     }
   };
 
+  const handleShowListings = async () => {
+    try {
+      const res = await fetch(`/api/user/listings/${currentUser._id}`, 
+      { method: "GET", credentials: "include" });
+      const data = await res.json();
+      } catch (error) {
+      console.error("Error fetching listings:", error);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-lg mx-auto">
@@ -288,6 +298,7 @@ const Profile = () => {
           {error && (
             <p className="text-red-500 text-center mt-6 text-sm font-medium">{error}</p>
           )}
+          <button onClick={handleShowListings} className="text-blue-500 w-full">Show Listing</button>
         </div>
       </div>
     </main>

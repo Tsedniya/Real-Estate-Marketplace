@@ -23,6 +23,7 @@ const Profile = () => {
   const [preview, setPreview] = useState(null);
   const [progress, setProgress] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
+  const [userListings, setUserListings] = useState([]);
   const fileRef = useRef(null);
 
   const primaryColor = "#022222";
@@ -156,9 +157,32 @@ const Profile = () => {
       const res = await fetch(`/api/user/listings/${currentUser._id}`, 
       { method: "GET", credentials: "include" });
       const data = await res.json();
-      } catch (error) {
+      setUserListings(data);
+    } catch (error) {
       console.error("Error fetching listings:", error);
     }
+  };
+
+  const handleDeleteListing = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUserListings(userListings.filter(listing => listing._id !== listingId));
+        setSuccessMessage("✓ Listing deleted successfully!");
+      }
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      dispatch(updateUserFailure(error.message));
+    }
+  };
+
+  const handleEditListing = (listingId) => {
+    // Navigate to edit listing page
+    window.location.href = `/edit-listing/${listingId}`;
   };
 
   return (
@@ -299,6 +323,43 @@ const Profile = () => {
             <p className="text-red-500 text-center mt-6 text-sm font-medium">{error}</p>
           )}
           <button onClick={handleShowListings} className="text-blue-500 w-full">Show Listing</button>
+          {userListings && userListings.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg mb-2">Your Listings:</h3>
+              <ul className="space-y-3">
+                {userListings.map((listing) => (
+                  <li key={listing._id} className="text-slate-700 flex items-start gap-4 p-3 border border-slate-200 rounded-lg justify-between">
+                    <div className="flex gap-4">
+                      <Link to={`/listing/${listing._id}`} className="flex-shrink-0">
+                        <img
+                          src={listing.image}
+                          alt={listing.title}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                      </Link>
+                      <Link to={`/listing/${listing._id}`} className="text-blue-600 hover:underline font-medium"> 
+                        {listing.name}
+                      </Link>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => handleDeleteListing(listing._id)}
+                        className="text-red-600 hover:text-red-800 text-sm px-3 py-1 rounded hover:bg-red-50 transition"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => handleEditListing(listing._id)}
+                        className="text-blue-600 hover:text-blue-800 text-sm px-3 py-1 rounded hover:bg-blue-50 transition"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </main>

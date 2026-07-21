@@ -183,7 +183,8 @@ const EditListing = () => {
 
       console.log("Listing updated:", data);
       alert("Listing updated successfully!");
-      navigate("/profile");
+      // redirect to the updated listing page
+      navigate(`/listing/${id}`);
     } catch (error) {
       console.log(error);
       alert(error.message);

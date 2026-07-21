@@ -68,3 +68,21 @@ export const getUserListings = async (req, res, next) => {
     );
   }
 };
+
+export const getUser = async (req, res, next) => {
+  if (req.user.id.toString() === req.params.id) {
+    try {
+      const user = await User.findById(req.params.id).select('-password');
+      if (!user) {
+        return next(errorHandler(404, "User not found"));
+      }
+      return res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    return next(
+      errorHandler(401, "You can only view your own profile!")
+    );
+  }
+};    

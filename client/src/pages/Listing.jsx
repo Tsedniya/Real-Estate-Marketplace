@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Listing = () => {
-	
+	const { currentUser } = useSelector((state) => state.user);
 	const { id } = useParams();
 	const [listing, setListing] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [showContact, setShowContact] = useState(false);
+	const [message, setMessage] = useState("");
+	const [sending, setSending] = useState(false);
+	const [contactResult, setContactResult] = useState(null);
 
 	useEffect(() => {
 		if (!id) return;
@@ -68,6 +73,77 @@ const Listing = () => {
 				</div>
 				{listing.createdAt && (
 					<p className="mt-3 text-xs text-slate-400">Posted: {new Date(listing.createdAt).toLocaleString()}</p>
+				)}
+
+				{/* Contact landlord - only if NOT the owner */}
+				{currentUser && listing.userRef === currentUser._id && (
+				<div className="mt-6">
+					<button
+						className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+						onClick={() => { setShowContact((s) => !s); setContactResult(null); }}
+					>
+						{showContact ? 'Close' : 'Contact Landlord'}
+					</button>
+					{showContact && (
+						<div className="mt-4">
+							<textarea
+								value={message}
+								onChange={(e) => setMessage(e.target.value)}
+								rows={5}
+								placeholder="Write your message to the landlord..."
+								className="w-full p-3 border border-slate-200 rounded-lg resize-y"
+							/>
+							<div className="flex items-center gap-3 mt-3">
+							<button
+								onClick={() => {
+									if (!message.trim()) {
+									return setContactResult({
+										ok: false,
+										message: "Please enter a message.",
+									});
+									}
+
+									const landlordEmail = listing.userRef?.email;
+
+									if (!landlordEmail) {
+									return setContactResult({
+										ok: false,
+										message: "Landlord email not found.",
+									});
+									}
+
+									const subject = `Regarding your listing: ${listing.name}`;
+
+									const body = `
+								Hello,
+
+								${message}
+
+								Listing: ${listing.name}
+								Address: ${listing.address}
+
+								From:
+								${currentUser?.username}
+								`;
+
+									window.location.href = `mailto:${landlordEmail}?subject=${encodeURIComponent(
+									subject
+									)}&body=${encodeURIComponent(body)}`;
+								}}
+								className="px-4 py-2 rounded-lg bg-green-600 text-white"
+								>
+								Send Message
+								</button>
+								<button type="button" className="px-3 py-2 rounded-lg bg-slate-200" onClick={() => setMessage('')}>
+									Clear
+								</button>
+							</div>
+							{contactResult && (
+								<p className={`mt-3 text-sm ${contactResult.ok ? 'text-green-600' : 'text-red-600'}`}>{contactResult.message}</p>
+							)}
+						</div>
+					)}
+				</div>
 				)}
 			</div>
 		</main>

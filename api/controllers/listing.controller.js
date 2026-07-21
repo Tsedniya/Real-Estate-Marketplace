@@ -71,3 +71,45 @@ export const updateListing = async(req, res, next)=>{
   }
 }
 
+export const getListings = async (req, res, next) => {
+
+  try {
+    const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
+    const startIndex = parseInt(req.query.startIndex) || 0; // Default startIndex to 0 if not 
+    let offer = req.query.offer;
+
+    if (offer === 'undefined' || offer ==='false') {
+      offer = {$in: [false, true]};
+    }
+    let parking = req.query.parking;
+
+    if (parking === 'undefined' || parking === 'false'){
+      parking = {$in: [false, true]};
+    }
+    let type = req.query.type;
+
+    if (type === 'undefined' || type === 'false'){
+      type = {$in: ['sale', 'rent']};
+    }
+
+    const searchTearm = req.query.searchTerm || '';
+
+    const sort = req.query.sort || 'createdAt'; // Default sort by createdAt
+
+    const order = req.query.order === 'desc' ? -1 : 1; // Default order to ascending
+
+    const listings = await Listing.find({
+      name: { $regex: searchTearm, $options: 'i' },
+      offer: offer,
+      parking: parking,
+      type: type
+    })
+    .sort({ [sort]: order })
+    .skip(startIndex)
+    .limit(limit);
+
+    return res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+};  

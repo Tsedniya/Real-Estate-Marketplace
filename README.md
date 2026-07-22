@@ -1,4 +1,4 @@
- !!MERN Real Estate Marketplace
+ MERN Real Estate Marketplace
 
 Real estate marketplace built with the **MERN stack**.
 Users can sign up, sign in (including Google OAuth), browse property listings, create their own listings, and manage their profile. Authentication is handled with **JWT**, and global state is managed using **Redux Toolkit**.

@@ -21,7 +21,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "http://localhost:5176",
+      "https://real-estate-marketplace-k3zk.vercel.app",
     ],
     credentials: true,
   })

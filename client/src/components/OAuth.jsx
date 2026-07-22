@@ -17,18 +17,18 @@ const OAuth = () => {
       const result = await signInWithPopup(auth, provider);
       console.log("Backend URL:", import.meta.env.VITE_API_URL);
       // use relative URL so Vite dev proxy includes cookies correctly
-      const res = await fetch(`/api/auth/google`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: result.user.displayName,
-          email: result.user.email,
-          photo: result.user.photoURL
-        }),
-      });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: result.user.displayName,
+        email: result.user.email,
+        photo: result.user.photoURL
+      }),
+    });
 
       const text = await res.text();
       console.log('Google auth response status:', res.status);

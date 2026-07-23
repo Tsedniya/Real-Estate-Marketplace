@@ -1,12 +1,38 @@
-import React from 'react'
+
 import { NavLink,Link } from 'react-router-dom'
 import {FaSearch} from 'react-icons/fa'
 import {useSelector} from 'react-redux'
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 const Header = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const navigate = useNavigate();
+  const location = useLocation();  
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    console.log('Search term:', searchTerm);
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    urlParams.set('search', searchTerm);
+
+    const searchQuery = urlParams.toString();
+
+    navigate(`/search?${searchQuery}`);
+  };
+   useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get('search');
+
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+  }, [location.search]);
   return (
     <header className="w-full border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
       
@@ -23,13 +49,18 @@ const Header = () => {
         </Link>
 
         {/* Search */}
-        <form className="hidden sm:flex items-center bg-slate-100 px-3 py-2 rounded-full w-[280px] focus-within:ring-2 focus-within:ring-blue-500 transition">
+        <form onSubmit={handleSubmit} className="hidden sm:flex items-center bg-slate-100 px-3 py-2 rounded-full w-[280px] focus-within:ring-2 focus-within:ring-blue-500 transition">
           <input
             type="text"
             placeholder="Search properties..."
             className="bg-transparent w-full text-sm outline-none placeholder:text-slate-400"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FaSearch className="text-slate-500 text-sm" />
+          <button>
+            <FaSearch className="text-slate-500 text-sm" />
+          </button>
+         
         </form>
 
         {/* Nav */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
+import ListingItem from "../components/ListingItem";
 
 const Search = () => {
 
@@ -7,6 +8,7 @@ const Search = () => {
   const location = useLocation();
   const [listings, setListings] = useState([]); 
   const [loading, setLoading] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const [sidebardata, setSidebardata] = React.useState({
     searchTerm: "",
@@ -74,11 +76,16 @@ const Search = () => {
   useEffect(() => {
     const fetchListings = async () => {
         setLoading(true);
-
+        setShowMore(false);
         const urlParams = new URLSearchParams(location.search);
 
         const res = await fetch(`/api/listing/get?${urlParams.toString()}`);
         const data = await res.json();
+        if (data.length > 8) {
+          setShowMore(true);
+        }else{
+          setShowMore(false);
+        }
 
         setListings(data);
         setLoading(false);
@@ -101,6 +108,18 @@ const Search = () => {
     const searchQuery = urlParams.toString();
     window.location.href = `/search?${searchQuery}`;
 
+  };
+
+  const onShowMoreClick = async () => {
+    const numberOfListings = listings.length;
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("showMore", true);
+    const res = await fetch(`/api/listing/get?${urlParams.toString()}`);
+    const data = await res.json();
+    if (data.length < 9) {
+      setShowMore(false);
+    }
+    setListings([...listings, ...data]);
   };
 
   return (
@@ -281,6 +300,16 @@ const Search = () => {
                     />
                     ))}
                 </div>
+                {showMore && (
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={onShowMoreClick}
+                      className="rounded-lg bg-blue-600 px-6 py-3 text-white font-medium transition hover:bg-blue-700"
+                    >
+                      Show More
+                    </button>
+                  </div>
+                )}
           </section>
         </div>
       </div>

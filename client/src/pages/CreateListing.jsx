@@ -24,7 +24,7 @@ const CreateListing = () => {
     discountPrice: 0,
   });
 
-  const primaryColor = "#022222";
+  const primaryColor = "#3B82F6";
 
 
   // Handle form input changes
@@ -272,7 +272,7 @@ const CreateListing = () => {
                   type="button"
                   onClick={handleImageSubmit}
                   disabled={uploading || !file}
-                  className="mt-4 w-full py-4 rounded-2xl text-white font-semibold text-sm uppercase tracking-widest transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-4 w-full py-2 bg-blue-500 rounded-2xl text-white font-semibold text-sm uppercase tracking-widest transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {uploading ? "Uploading Images..." : "Upload Selected Images"}
@@ -311,7 +311,7 @@ const CreateListing = () => {
               {/* Create Button */}
               <button
                 type="submit"
-                className="w-full py-2 rounded-3xl text-white font-semibold text-Xl tracking-wide hover:brightness-110 active:scale-[0.985] transition-all shadow-lg"
+                className="w-full py-2 rounded-3xl bg-blue-500 text-white font-semibold text-Xl tracking-wide hover:brightness-110 active:scale-[0.985] transition-all shadow-lg"
                 style={{ backgroundColor: primaryColor }}
               >
                 Create Listing

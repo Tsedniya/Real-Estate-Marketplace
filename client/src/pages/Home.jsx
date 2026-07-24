@@ -3,6 +3,42 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   const primaryColor = "#022222";
+  const [offerListings, setOfferListings] = React.useState([]);
+  const [saleListings, setSaleListings] = React.useState([]);
+  const [rentListings, setRentListings] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchOfferListings = async () => {
+      try {
+        const res = await fetch('/api/listings/get?offer=true&limit=3');
+        const data = await res.json();
+        setOfferListings(data);
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      }
+    }
+    const fetchRentListings = async () => {
+      try {
+        const res = await fetch('/api/listings/get?type=rent&limit=3');
+        const data = await res.json();
+        setRentListings(data);
+      } catch (error) {
+        console.error('Error fetching rent listings:', error);
+      }
+    }
+    const fetchSaleListings = async () => {
+      try {
+        const res = await fetch('/api/listings/get?type=sale&limit=3');
+        const data = await res.json();
+        setSaleListings(data);
+      } catch (error) {
+        console.error('Error fetching sale listings:', error);
+      }
+    }
+    fetchOfferListings();
+    fetchRentListings();
+    fetchSaleListings();
+  }, []);
 
   return (
     <div className="bg-slate-50">
@@ -96,42 +132,79 @@ const Home = () => {
       </section>
 
       {/* FEATURED PROPERTIES */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-between items-end mb-10">
-            <h2 className="text-4xl font-semibold tracking-tight text-slate-900">Featured Properties</h2>
-            <Link to="/search" className="font-medium text-[#022222] hover:underline flex items-center gap-2">
-              View All →
-            </Link>
-          </div>
+      {/* FEATURED PROPERTIES */}
+<section className="py-20 bg-slate-50">
+  <div className="max-w-6xl mx-auto px-6">
+    <div className="flex justify-between items-end mb-10">
+      <h2 className="text-4xl font-semibold tracking-tight text-slate-900">
+        Featured Properties
+      </h2>
+      <Link 
+        to="/search" 
+        className="font-medium text-[#022222] hover:underline flex items-center gap-2 hover:text-blue-600 transition-colors"
+      >
+        View All →
+      </Link>
+    </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-3xl overflow-hidden shadow hover:shadow-2xl transition-all group">
-                <div className="relative h-64">
-                  <img 
-                    src={`https://picsum.photos/id/${70 + i}/600/400`} 
-                    alt="property" 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute top-4 right-4 bg-white px-4 py-1 rounded-2xl text-sm font-semibold shadow" 
-                       style={{ color: primaryColor }}>
-                    Featured
-                  </div>
-                </div>
-                <div className="p-7">
-                  <p className="text-sm text-slate-500">Addis Ababa • Villa</p>
-                  <h3 className="font-semibold text-xl mt-1">Luxury 5 Bedroom Villa with Garden</h3>
-                  <p className="text-2xl font-bold mt-3 text-slate-900">ETB 45,000,000</p>
-                </div>
-              </div>
-            ))}
+    <div className="grid md:grid-cols-3 gap-8">
+      {[
+        {
+          id: 1,
+          image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2070",
+          location: "Addis Ababa • Bole",
+          title: "Luxury 5 Bedroom Villa with Garden",
+          price: "ETB 45,000,000"
+        },
+        {
+          id: 2,
+          image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075",
+          location: "Addis Ababa • CMC",
+          title: "Modern 4 Bedroom Smart Home",
+          price: "ETB 32,500,000"
+        },
+        {
+          id: 3,
+          image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=2070",
+          location: "Addis Ababa • Old Airport",
+          title: "Elegant 6 Bedroom Mansion",
+          price: "ETB 68,000,000"
+        }
+      ].map((property) => (
+        <div 
+          key={property.id} 
+          className="bg-white rounded-3xl overflow-hidden shadow hover:shadow-2xl transition-all group cursor-pointer"
+        >
+          <div className="relative h-64 overflow-hidden">
+            <img 
+              src={property.image} 
+              alt={property.title} 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div 
+              className="absolute top-4 right-4 bg-white px-4 py-1 rounded-2xl text-sm font-semibold shadow"
+              style={{ color: primaryColor }}
+            >
+              Featured
+            </div>
+          </div>
+          
+          <div className="p-7">
+            <p className="text-sm text-slate-500">{property.location}</p>
+            <h3 className="font-semibold text-xl mt-1 leading-tight line-clamp-2">
+              {property.title}
+            </h3>
+            <p className="text-2xl font-bold mt-4 text-slate-900">
+              {property.price}
+            </p>
           </div>
         </div>
-      </section>
-
+      ))}
+    </div>
+  </div>
+</section>
       {/* FINAL CTA */}
-      <section className="py-24 bg-[#022222] text-white text-center">
+      <section className="py-24 bg-[#224670] text-white text-center">
         <div className="max-w-2xl mx-auto px-6">
           <h2 className="text-5xl font-semibold tracking-tight mb-6">
             Ready to Find Your Perfect Home?
@@ -142,7 +215,7 @@ const Home = () => {
           
           <Link
             to="/create-listing"
-            className="inline-flex items-center gap-4 px-12 py-6 rounded-3xl text-xl font-semibold bg-white text-[#022222] hover:bg-slate-100 active:scale-95 transition-all"
+            className="inline-flex items-center gap-4 px-12 py-4 rounded-3xl text-xl font-semibold bg-white text-[#022222] hover:bg-slate-100 active:scale-95 transition-all"
           >
             Let's Start Now
             <span className="text-3xl">🚀</span>

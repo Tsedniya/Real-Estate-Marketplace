@@ -28,7 +28,6 @@ const Profile = () => {
 
   const primaryColor = "#022222";
 
-  // Clear success message after 5 seconds
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(""), 5000);
@@ -36,7 +35,6 @@ const Profile = () => {
     }
   }, [successMessage]);
 
-  // Handle text input
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -44,7 +42,6 @@ const Profile = () => {
     });
   };
 
-  // Handle image selection
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -54,8 +51,7 @@ const Profile = () => {
     setPreview(URL.createObjectURL(selectedFile));
   };
 
-  // Update profile
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
   e.preventDefault();
 
   dispatch(updateUserStart());
@@ -181,24 +177,21 @@ const Profile = () => {
   };
 
   const handleEditListing = (listingId) => {
-    // Navigate to edit listing page
     window.location.href = `/edit-listing/${listingId}`;
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 py-8 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-8 px-4">
       <div className="max-w-lg mx-auto">
-        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-slate-100">
-          {/* Header */}
-          <div className="text-center mb-10">
+        <div className="w-full bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-100">
+          <div className="text-center mb-10 px-8 pt-8">
             <h1 className="text-4xl font-semibold tracking-tight text-slate-900 mb-2">
-              My Profile
+              My <span className="text-blue-500">Profile</span>
             </h1>
-            <p className="text-slate-600">Manage your account information</p>
+            <p className="text-sm text-slate-500">Manage your account information</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Profile Image */}
+          <form onSubmit={handleSubmit} className="space-y-8 px-8 pb-8">
             <div className="flex flex-col items-center">
               <div 
                 className="relative cursor-pointer group"
@@ -207,7 +200,7 @@ const Profile = () => {
                 <img
                   src={preview || currentUser?.avatar}
                   alt="profile"
-                  className="rounded-3xl h-32 w-32 object-cover ring-4 ring-slate-100 group-hover:ring-[#022222] transition-all"
+                  className="rounded-3xl h-32 w-32 object-cover ring-4 ring-slate-100 group-hover:ring-blue-500 transition-all"
                 />
                
               </div>
@@ -222,24 +215,24 @@ const Profile = () => {
               />
             </div>
 
-            {/* Form Fields */}
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Username</label>
                 <input
-                  className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
+                  className="h-10 text-sm border border-slate-200 focus:border-blue-500 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 w-full rounded-2xl px-3"
                   id="username"
                   type="text"
                   value={formData.username ?? (currentUser?.username || "")}
                   placeholder="Username"
                   onChange={handleChange}
                 />
+
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                 <input
-                  className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
+                  className="h-10 text-sm border border-slate-200 focus:border-blue-500 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 w-full rounded-2xl px-3"
                   id="email"
                   type="email"
                   value={formData.email ?? (currentUser?.email || "")}
@@ -251,17 +244,16 @@ const Profile = () => {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">New Password</label>
                 <input
-                  className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:outline-none focus:border-[#022222] focus:ring-1 focus:ring-[#022222] transition-all"
-                  id="password"
-                  type="password"
-                  value={formData.password || ""}
-                  placeholder="New password (optional)"
-                  onChange={handleChange}
-                />
+                    className="h-10 text-smborder border-slate-200 focus:border-blue-500 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 w-full rounded-2xl px-3"
+                    id="password"
+                    type="password"
+                    value={formData.password || ""}
+                    placeholder="New password (optional)"
+                    onChange={handleChange}
+                  />
               </div>
             </div>
 
-            {/* Progress Bar */}
             {progress > 0 && (
               <div className="w-full space-y-2">
                 <div className="flex justify-between items-center">
@@ -270,40 +262,35 @@ const Profile = () => {
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-[#022222] to-[#044444] h-full rounded-full transition-all duration-300 ease-out"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-300 ease-out"
                     style={{ width: `${Math.min(progress, 100)}%` }}
                   ></div>
                 </div>
               </div>
             )}
 
-            {/* Update Button */}
             <button
               disabled={loading || progress > 0}
-              className="w-full py-4 rounded-2xl text-white font-semibold text-lg tracking-widest transition-all hover:brightness-110 active:scale-[0.985] shadow-lg disabled:opacity-70"
-              style={{ backgroundColor: primaryColor }}
+              className="w-full h-10 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {loading ? "Updating..." : "Update Profile"}
             </button>
 
-            {/* Success Message */}
             {successMessage && (
               <div className="w-full p-4 bg-green-50 border border-green-200 rounded-2xl">
                 <p className="text-green-700 font-medium text-center text-sm">{successMessage}</p>
               </div>
             )}
 
-            {/* Create Listing Link */}
             <Link
-              to="/create-listing"
-              className="w-full py-4 border border-slate-300 hover:border-[#022222] hover:text-[#022222] rounded-2xl text-center font-semibold transition-all block"
-            >
-              Create New Listing
-            </Link>
+            to="/create-listing"
+            className="w-full h-10 flex items-center justify-center border border-slate-300 hover:border-blue-600 hover:text-blue-600 rounded-lg text-center text-sm font-medium transition-all block text-slate-700"
+          >
+            Create New Listing
+          </Link>
           </form>
 
-          {/* Danger Zone */}
-          <div className="flex justify-between mt-10 pt-6 border-t border-slate-100 text-sm">
+          <div className="flex justify-between mt-3 pt-3 px-8 border-t border-slate-100 text-sm">
             <span
               onClick={handleDeleteUser}
               className="text-red-600 hover:text-red-700 cursor-pointer font-medium transition"
@@ -320,46 +307,56 @@ const Profile = () => {
           </div>
 
           {error && (
-            <p className="text-red-500 text-center mt-6 text-sm font-medium">{error}</p>
+            <p className="text-red-500 text-center mt-6 text-sm font-medium px-8">{error}</p>
           )}
-          <button onClick={handleShowListings} className="text-blue-500 w-full">Show Listing</button>
-          {userListings && userListings.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-lg mb-2">Your Listings:</h3>
-              <ul className="space-y-3">
-                {userListings.map((listing) => (
-                  <li key={listing._id} className="text-slate-700 flex items-start gap-4 p-3 border border-slate-200 rounded-lg justify-between">
-                    <div className="flex gap-4">
-                      <Link to={`/listing/${listing._id}`} className="flex-shrink-0">
+          <button onClick={handleShowListings} className="text-blue-600 w-full mt-4 mb-4 font-medium">
+            Show Listing
+          </button>
+             {userListings && userListings.length > 0 && (
+                <div className="flex flex-col gap-4 px-8 pb-8">
+                  <h1 className="text-center mt-7 text-2xl font-semibold text-slate-900">
+                    Your Listings
+                  </h1>
+
+                  {userListings.map((listing) => (
+                    <div
+                      key={listing._id}
+                      className="flex items-center justify-between rounded-lg p-3 shadow-sm border border-slate-100"
+                    >
+                      <Link
+                        to={`/listing/${listing._id}`}
+                        className="flex items-center gap-4 flex-1"
+                      >
                         <img
-                          src={listing.image}
-                          alt={listing.title}
-                          className="w-24 h-24 object-cover rounded-lg"
+                          src={listing.imageUrl}
+                          alt={listing.name}
+                          className="h-20 w-20 object-cover rounded"
                         />
+
+                        <p className="font-semibold text-slate-700 hover:underline">
+                          {listing.name}
+                        </p>
                       </Link>
-                      <Link to={`/listing/${listing._id}`} className="text-blue-600 hover:underline font-medium"> 
-                        {listing.name}
-                      </Link>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDeleteListing(listing._id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          onClick={() => handleEditListing(listing._id)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          Edit
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => handleDeleteListing(listing._id)}
-                        className="text-red-600 hover:text-red-800 text-sm px-3 py-1 rounded hover:bg-red-50 transition"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => handleEditListing(listing._id)}
-                        className="text-blue-600 hover:text-blue-800 text-sm px-3 py-1 rounded hover:bg-blue-50 transition"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+                  ))}
+                </div>
+              )}
         </div>
       </div>
     </main>

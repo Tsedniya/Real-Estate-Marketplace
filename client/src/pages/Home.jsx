@@ -3,7 +3,42 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   const primaryColor = "#022222";
- 
+  const [offerListings, setOfferListings] = React.useState([]);
+  const [saleListings, setSaleListings] = React.useState([]);
+  const [rentListings, setRentListings] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchOfferListings = async () => {
+      try {
+        const res = await fetch('/api/listings/get?offer=true&limit=3');
+        const data = await res.json();
+        setOfferListings(data);
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      }
+    }
+    const fetchRentListings = async () => {
+      try {
+        const res = await fetch('/api/listings/get?type=rent&limit=3');
+        const data = await res.json();
+        setRentListings(data);
+      } catch (error) {
+        console.error('Error fetching rent listings:', error);
+      }
+    }
+    const fetchSaleListings = async () => {
+      try {
+        const res = await fetch('/api/listings/get?type=sale&limit=3');
+        const data = await res.json();
+        setSaleListings(data);
+      } catch (error) {
+        console.error('Error fetching sale listings:', error);
+      }
+    }
+    fetchOfferListings();
+    fetchRentListings();
+    fetchSaleListings();
+  }, []);
 
   return (
     <div className="bg-slate-50">

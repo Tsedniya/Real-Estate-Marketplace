@@ -17,9 +17,7 @@ const OAuth = () => {
       const result = await signInWithPopup(auth, provider);
       console.log("Backend URL:", import.meta.env.VITE_API_URL);
       // use relative URL so Vite dev proxy includes cookies correctly
-     const API_URL = import.meta.env.VITE_API_URL;
-
-    const res = await fetch(`${API_URL}/api/auth/google`, {
+      const res = await fetch(`/api/auth/google`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -28,7 +26,7 @@ const OAuth = () => {
       body: JSON.stringify({
         name: result.user.displayName,
         email: result.user.email,
-        photo: result.user.photoURL,
+        photo: result.user.photoURL
       }),
     });
 

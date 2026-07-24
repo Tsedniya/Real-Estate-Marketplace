@@ -31,21 +31,20 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+
 app.get("/", (req, res) => {
   res.send("Real Estate API is running 🚀");
 });
-
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/listing", listingRoutes);
 
 app.use(express.static(path.join(__dirname, "client/dist")));
+
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
-
-
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -58,7 +57,6 @@ app.use((err, req, res, next) => {
     message,
   });
 });
-
 
 const PORT = process.env.PORT || 5001;
 

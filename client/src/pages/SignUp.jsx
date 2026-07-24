@@ -51,9 +51,6 @@ const SignUp = () => {
     <Card className="w-full max-w-md shadow-xl border-slate-200/60">
 
       <CardHeader className="text-center space-y-2 pb-4">
-        <div className="mx-auto h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
-          🏡
-        </div>
 
         <CardTitle className="text-2xl font-semibold tracking-tight text-slate-900">
           Create account

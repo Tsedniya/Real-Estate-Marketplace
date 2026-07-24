@@ -1,19 +1,50 @@
-import React from 'react'
+import React from "react";
+import { Link } from "react-router-dom";
 
-const ListingItem = ({listing}) => {
+const ListingItem = ({ listing }) => {
+  console.log(listing);
   return (
-    <div className='bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden'>
-       <Link to={`/listing/${listing.id}`}>
-       <img src={listing.imageUrls[0]} 
-       alt= 'listing cover'
-        className='h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-scale duration-300'/>
+    <Link
+      to={`/listing/${listing._id}`}
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+    >
+      {/* Listing Image */}
+      <img
+        src={listing.imageUrl || listing.imageUrls?.[0]}
+        alt={listing.name}
+        className="h-56 w-full object-cover"
+      />
     
-    <div className='p-3'>
-        <p className='truncate text-lg font-semibold text-slate-700'>{listing.name}</p>
-    </div>
-    </Link>
-    </div>
-  )
-}
+      {/* Listing Details */}
+      <div className="p-4">
+        <h2 className="text-lg font-semibold text-slate-800 truncate">
+          {listing.name}
+        </h2>
 
-export default ListingItem
+        <p className="text-sm text-gray-500 mt-2">
+          📍 {listing.address}
+        </p>
+
+        <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+          {listing.description}
+        </p>
+
+        <p className="text-lg font-bold text-green-600 mt-3">
+          Birr{" "}
+          {listing.offer
+            ? listing.discountPrice.toLocaleString("en-US")
+            : listing.regularPrice.toLocaleString("en-US")}
+          {listing.type === "rent" && " / month"}
+        </p>
+
+        {/* Bedrooms */}
+        <p className="text-sm text-gray-700 mt-2">
+          🛏 {listing.bedrooms}{" "}
+          {listing.bedrooms === 1 ? "Bedroom" : "Bedrooms"}
+        </p>
+      </div>
+    </Link>
+  );
+};
+
+export default ListingItem;

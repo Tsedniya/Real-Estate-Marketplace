@@ -68,9 +68,6 @@ const SignIn = () => {
 
         {/* HEADER */}
         <CardHeader className="text-center space-y-2 pb-4">
-          <div className="mx-auto h-11 w-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-semibold shadow-md">
-            R
-          </div>
 
           <CardTitle className="text-2xl font-semibold tracking-tight text-slate-900">
             Sign in

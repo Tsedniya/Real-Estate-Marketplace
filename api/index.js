@@ -22,7 +22,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "http://localhost:5174"
+      "http://localhost:5174",
+      "https://real-estate-marketplace-frontend-xi.vercel.app"
     ],
     credentials: true,
   })

@@ -4,10 +4,11 @@ import jwt from 'jsonwebtoken'
 import {errorHandler} from '../utils/error.js'
 
 const isProduction = process.env.NODE_ENV === 'production';
+
 const cookieOptions = {
   httpOnly: true,
-  secure: false,
-  sameSite: 'lax',
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
 };
 
 export const signup = async(req, res, next) => {

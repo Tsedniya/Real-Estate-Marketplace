@@ -33,15 +33,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-console.log("MONGO exists:", !!process.env.MONGO);
-
-mongoose
-  .connect(process.env.MONGO)
-  .then(() => console.log("✅ connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
-
 app.get("/", (req, res) => {
-  res.send("Real Estate API is running 🚀");
+  res.send("Real Estate API is running");
 });
 
 app.use("/api/user", userRoutes);

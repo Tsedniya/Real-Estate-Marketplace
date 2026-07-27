@@ -11,26 +11,30 @@ dotenv.config();
 
 const app = express();
 
+// ---------- MongoDB connection ----------
+let isConnected = false;
+
 const connectDB = async () => {
-  try {
-    if (!process.env.MONGO) {
-      throw new Error("MONGO environment variable is missing");
-    }
-
-    console.log("🔄 Connecting to MongoDB...");
-
-    await mongoose.connect(process.env.MONGO, {
-      bufferCommands: false,
-    });
-
-    console.log("✅ Connected to MongoDB successfully");
-  } catch (err) {
-    console.error("❌ MongoDB connection failed:");
-    console.error(err.message);
-    throw err;
+  if (isConnected) {
+    return;
   }
+
+  if (!process.env.MONGO) {
+    throw new Error("MONGO environment variable is missing");
+  }
+
+  console.log("🔄 Connecting to MongoDB...");
+
+  await mongoose.connect(process.env.MONGO, {
+    bufferCommands: false,
+  });
+
+  isConnected = true;
+
+  console.log("✅ Connected to MongoDB successfully");
 };
 
+// ---------- Middleware ----------
 app.use(
   cors({
     origin: [
@@ -45,14 +49,32 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// ---------- MongoDB middleware ----------
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      statusCode: 500,
+      message: "Database connection failed",
+    });
+  }
+});
+
+// ---------- Routes ----------
 app.get("/", (req, res) => {
-  res.send("Real Estate API is running");
+  res.send("Real Estate API is running 🚀");
 });
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/listing", listingRoutes);
 
+// ---------- Error handler ----------
 app.use((err, req, res, next) => {
   console.error("🔥 ERROR:", err);
 
@@ -66,18 +88,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5001;
-
-const startServer = async () => {
-  try {
-    await connectDB();
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Server failed to start:", error);
-  }
-};
-
-startServer();
+// ---------- Export for Vercel ----------
+export default app;

@@ -1,4 +1,5 @@
 import Listing from '../models/listing.model.js' 
+import User from '../models/user.model.js';
 
 export const createListing = async(req, res, next)=>{
 
@@ -21,16 +22,16 @@ export const deleteListing = async(req, res, next)=>{
   try {
     const listing = await Listing.findById(req.params.id);
     if (!listing) {
-      return res.status(404).json({ message: 'Listing not found' });
+      return res.status(404).json({ success: false, message: 'Listing not found' });
     }
 
     // Check if the user is the owner of the listing
     if (listing.userRef.toString() !== req.user.id.toString()) {
-      return res.status(403).json({ message: 'You can delete only your own listings' });
+      return res.status(403).json({ success: false, message: 'You can delete only your own listings' });
     }
 
     await Listing.findByIdAndDelete(req.params.id);
-    return res.status(200).json({ message: 'Listing deleted successfully' });
+    return res.status(200).json({ success: true, message: 'Listing deleted successfully' });
   } catch (error) {
     next(error);
   }
@@ -43,11 +44,15 @@ export const getListing = async (req, res, next) => {
       return res.status(404).json({ message: 'Listing not found' });
     }
 
-    if (listing.userRef.toString() !== req.user.id.toString()) {
-      return res.status(403).json({ message: 'You can view only your own listing' });
+    const owner = listing.userRef ? await User.findById(listing.userRef).select('email username') : null;
+    const listingData = listing.toObject();
+
+    if (owner) {
+      listingData.ownerEmail = owner.email;
+      listingData.ownerUsername = owner.username;
     }
 
-    return res.status(200).json(listing);
+    return res.status(200).json(listingData);
   } catch (error) {
     next(error);
   }
@@ -112,4 +117,4 @@ export const getListings = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};  
+};
